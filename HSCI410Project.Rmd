@@ -1,0 +1,391 @@
+---
+title: "HSCI410WOrk"
+author: "Mark Ly"
+date: "11/19/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+library(dplyr)
+library(ggplot2)
+depdata <- select(x, ADM_RNO, DODEP, DOWST, DEPDVSEV, GEN_020, GEN_025, WSTDVSKI,WSTDVPSY,WSTDVJIN,WSTDVPSY,WSTDVAUT,WSTDVJST,WSTDVSOC,LBFDGHPW,LBFDVPFT,CCC_195,CCC_200,GEO_PRV,DHH_SEX,DHHGMS,DHHGAGE,GENDVHDI,GENDVMHI,INCDGPER,INCDGHH)
+
+#Recoding data from strings to numerical ranks from 0-1,9 is used to combine those who answered "Not stated" or "Valid skip"
+scale1 <- function(x){
+  case_when(x %in% c("Poor")~0,
+            x %in% c("Fair")~1,
+            x %in% c("Good")~2,
+            x %in% c("Very good")~3,
+            x %in% c("Excellent")~4,
+            x %in% c("Not stated")~9)
+}
+scale2 <- function(x){
+  case_when(x %in% c("Married")~0,
+            x %in% c("Common-law")~1,
+            x %in% c("Widowed/Divorced/Separated")~2,
+            x %in% c("Single")~3,
+            x %in% c("Not stated")~9)
+}
+
+scale3 <- function(x){
+  case_when(x %in% c("No depression")~0,
+            x %in% c("Minimal depression")~1,
+            x %in% c("Mild depression")~2,
+            x %in% c("Moderate depression")~3,
+            x %in% c("Moderately severe depression")~4,
+            x %in% c("Severe depression")~5,
+            x %in% c("Valid skip")~9,
+            x %in% c("Not stated")~9)
+}
+
+scale4 <- function(x){
+  case_when(x %in% c("Full-time")~0,
+            x %in% c("Part-time")~1,
+            x %in% c("Valid skip")~9,
+            x %in% c("Not stated")~9)
+}
+
+scale5 <- function(x){
+  case_when(x %in% c("No income or income loss")~0,
+            x %in% c("Less than $20,000")~1,
+            x %in% c("$20,000 to $39,999")~2,
+            x %in% c("$40,000 to $59,999")~3,
+            x %in% c("$60,000 to $79,999")~4,
+            x %in% c("$80,000 or more")~5,
+            x %in% c("Valid skip")~9,
+            x %in% c("Not stated")~9)
+}
+
+scale6 <- function(x){
+  case_when(x %in% c("Not at all satisfied")~0,
+            x %in% c("Not too satisfied")~1,
+            x %in% c("Somewhat satisfied")~2,
+            x %in% c("Very satisfied")~3,
+            x %in% c("Valid skip")~9,
+            x %in% c("Don’t know")~9,
+            x %in% c("Refusal")~9,
+            x %in% c("Not stated")~9)
+
+}
+
+scale7 <- function(x){
+  case_when(x %in% c("Not at all stressful")~0,
+            x %in% c("Not very stressful")~1,
+            x %in% c("A bit stressful")~2,
+            x %in% c("Quite a bit stressful")~3,
+            x %in% c("Extremely stressful")~4,
+            x %in% c("Don’t know")~9,
+            x %in% c("Refusal")~9,
+            x %in% c("Valid skip")~9,
+            x %in% c("Not stated")~9)
+            
+}
+
+scale8 <- function(x){
+  case_when(x %in% c("Strongly disagree")~0,
+            x %in% c("Disagree")~1,
+            x %in% c("Neither agree nor disagree")~2,
+            x %in% c("Agree")~3,
+            x %in% c("Strongly agree")~4,
+            x %in% c("Valid skip")~9,
+            x %in% c("Don’t know")~9,
+            x %in% c("Not applicable")~9,
+            x %in% c("Refusal")~9,
+            x %in% c("Not stated")~9)
+}
+
+scale9<- function(x){
+  case_when(x %in% c("Yes")~1,
+            x %in% c("No")~0)
+}
+
+scale10 <- function(x){
+  case_when(x %in% c("No income or less than $20,000")~0,
+            x %in% c("$20,000 to $39,999")~1,
+            x %in% c("$40,000 to $59,999")~2,
+            x %in% c("$60,000 to $79,999")~3,
+            x %in% c("$80,000 or more")~4,
+            x %in% c("Not stated")~9)
+}
+
+scale11<- function(x){
+  case_when(x %in% c("Very dissatisfied")~0,
+            x %in% c("Dissatisfied")~1,
+            x %in% c("Neither satisfied nor dissatisfied")~2,
+            x %in% c("Satisfied")~3,
+            x %in% c("Very satisfied")~4,
+            x %in% c("Valid skip")~9,
+            x %in% c("Refusal")~9,
+            x %in% c("Not stated")~9,
+            x %in% c("Don’t know")~9)
+}
+
+scale12<- function(x){
+  case_when(x %in% c("Female")~0,
+            x %in% c("Male")~1)
+}
+
+scale13<- function(x){
+  case_when(x %in% c("BRITISH COLUMBIA")~0,
+            x %in% c("ALBERTA")~1,
+            x %in% c("SASKATCHEWAN")~2,
+            x %in% c("MANITOBA")~3,
+            x %in% c("ONTARIO")~4,
+            x %in% c("QUEBEC")~5,
+            x %in% c("NEW BRUNSWICK")~6,
+            x %in% c("NOVA SCOTIA")~7,
+            x %in% c("PRINCE EDWARD ISLAND")~8,
+            x %in% c("NEWFOUNDLAND AND LABRADOR")~9,
+            x %in% c("YUKON")~10,
+            x %in% c("NUNAVUT")~11,
+            x %in% c("NORTHWEST TERRITORIES")~12)
+}
+
+scale14<- function(x){
+  case_when(x %in% c("Age between 12 and 14")~0,
+            x %in% c("Age between 15 and 17")~1,
+            x %in% c("Age between 18 and 19")~2,
+            x %in% c("Age between 20 and 24")~3,
+            x %in% c("Age between 25 and 29")~4,
+            x %in% c("Age between 30 and 34")~5,
+            x %in% c("Age between 35 and 39")~6,
+            x %in% c("Age between 40 and 44")~7,
+            x %in% c("Age between 45 and 49")~8,
+            x %in% c("Age between 50 and 54")~9,
+            x %in% c("Age between 55 and 59")~10,
+            x %in% c("Age between 60 and 64")~11,
+            x %in% c("Age between 65 and 69")~12,
+            x %in% c("Age between 70 and 74")~13,
+            x %in% c("Age between 75 and 79")~14,
+            x %in% c("Age 80 and older")~15)
+}
+
+scale15<- function(x){
+  case_when(x %in% c("[0-30)")~0,
+            x %in% c("[30-40)")~1,
+            x %in% c("[40-99)")~2)
+}
+
+scale16<- function(x){
+  case_when(x %in% c("White")~0,
+            x %in% c("Non-white (Aboriginal or Other Visible Minority)")~1,
+            x %in% c("Valid skip")~9,
+            x %in% c("Not stated")~9)
+}
+
+scale17<- function(x){
+  case_when(x %in% c("Yes")~0,
+            x %in% c("No")~1,
+            x %in% c("Don't know")~9,
+            x %in% c("Valid skip")~9,
+            x %in% c("Not stated")~9)
+}
+
+scale19<- function(x){
+  case_when(x %in% c("White")~0,
+            x %in% c("Non-white (Aboriginal or Other Visible Minority)")~1)
+}
+
+scale20 <- function(x){
+  case_when(x %in% c("Full-time")~0,
+            x %in% c("Part-time")~1)
+}
+
+#Apply scale to data
+depdata$DODEP <- sapply(depdata$DODEP,scale9)
+depdata$DOWST<- sapply(depdata$DOWST, scale9)
+
+# depdata$DEPDVSEV <- sapply(depdata$DEPDVSEV,scale3)
+# depdata$GEN_020 <- sapply(depdata$GEN_020,scale7)
+# depdata$GEN_025 <- sapply(depdata$GEN_025,scale7)
+# depdata$GEO_PRV<- sapply(depdata$GEO_PRV, scale13)
+# depdata$DHH_SEX<- sapply(depdata$DHH_SEX, scale12)
+# depdata$DHHGAGE<- sapply(depdata$DHHGAGE, scale14)
+# depdata$DHHGMS <- sapply(depdata$DHHGMS,scale2)
+# depdata$INCDGPER <- sapply(depdata$INCDGPER,scale5)
+# depdata$INCDGHH <- sapply(depdata$INCDGHH,scale10)
+# depdata$CCC_195 <- sapply(depdata$CCC_195,scale17)
+# depdata$CCC_200 <- sapply(depdata$CCC_200,scale17)
+# depdata$LBFDVPFT <- sapply(depdata$LBFDVPFT,scale4)
+# depdata$SDCDGCGT <- sapply(depdata$SDCDGCGT,scale16)
+depdata.race$SDCDGCGT <- sapply(depdata.race$SDCDGCGT,scale19)
+depdata.sex$DHH_SEX<- sapply(depdata.sex$DHH_SEX, scale12)
+depdata.type$LBFDVPFT <- sapply(depdata.type$LBFDVPFT,scale20)
+
+depdata[depdata$LBFDGHPW == "Not stated",]$LBFDGHPW = 0
+depdata[depdata$LBFDGHPW == "Valid skip",]$LBFDGHPW = 0
+
+
+#adding extra data to data set
+deprace <- dplyr::select(x, ADM_RNO, SDCDGCGT)
+depdata <- left_join(depdata, deprace, by ="ADM_RNO")
+
+
+
+
+
+```
+
+```{r}
+library(kableExtra)
+library(pixiedust)
+
+#Creating factors to compare data
+factor.life.stress <- factor(depdata$GEN_020, levels =c(0,1,2,3,4))
+factor.work.stress <- factor(depdata$GEN_025, levels = c(0,1,2,3,4))
+factor.inc.personal <- factor(depdata$INCDGPER, levels =c(0,1,2,3,4,5))
+factor.inc.household <- factor(depdata$INCDGHH, levels =c(0,1,2,3,4,5))
+
+factor.work.type <- factor(depdata$LBFDVPFT,levels =c(0,1))
+
+factor.work.sat <- factor(depdata$WST_070, levels = c(0,1,2,3,4))
+#factor.work.learn <- factor(depdata$WST_005, levels = c(0,1,2,3,4))
+#factor.work.highskill <- factor(depdata$WST_010, levels = c(0,1,2,3,4))
+#factor.work.decide <- factor(depdata$WST_015, levels = c(0,1,2,3,4))
+#factor.work.reptask <- factor(depdata$WST_020, levels = c(0,1,2,3,4))
+#factor.work.hectic <- factor(depdata$WST_025, levels = c(0,1,2,3,4))
+#factor.work.conf <- factor(depdata$WST_030, levels = c(0,1,2,3,4))
+#factor.work.security <- factor(depdata$WST_035, levels = c(0,1,2,3,4))
+#factor.work.physical <- factor(depdata$WST_040, levels = c(0,1,2,3,4))
+#factor.work.input <- factor(depdata$WST_045, levels = c(0,1,2,3,4))
+#factor.work.hostility <- factor(depdata$WST_050, levels = c(0,1,2,3,4))
+#factor.work.supervisor <- factor(depdata$WST_055, levels = c(0,1,2,3,4))
+#factor.work.coworkers <- factor(depdata$WST_060, levels = c(0,1,2,3,4))
+
+#factor.sat.job <- factor(depdata$SWL_005, levels =c(0,1,2,3,4))
+#factor.sat.financial <- factor(depdata$SWL_015, levels =c(0,1,2,3,4))
+#factor.sat.self <- factor(depdata$SWL_020, levels =c(0,1,2,3,4))
+
+
+#Filtering out data
+
+depdata.hours <- depdata %>%
+  filter(!LBFDGHPW %in% c("Not stated","Valid skip"))
+depdata.hours$LBFDGHPW <- as.numeric(depdata.hours$LBFDGHPW)
+
+depdata.race<- depdata %>%
+  filter(!SDCDGCGT %in% c("Not stated","Valid skip"))
+
+depdata.sex <- depdata 
+
+depdata.type <- depdata %>%
+  filter(!LBFDVPFT %in% c("Not stated","Valid skip"))
+
+bc<-x %>%
+  filter(GEO_PRV =="BRITISH COLUMBIA")
+
+#Tables for export
+tgroup%>%
+  rename(Depression_Status = DODEP)
+
+fit <- glm(depdata$DODEP ~ depdata$DOWST, family = "binomial")
+
+fit3 <- glm(depdata.race$DODEP ~ depdata.race$SDCDGCGT, family ="binomial")
+fit4 <- glm(depdata.race$DOWST ~ depdata.race$SDCDGCGT, family ="binomial")
+
+
+fit5<- glm(depdata.hours$DODEP ~ depdata.hours$LBFDGHPW, family = 'binomial')
+fit6<- glm(depdata.hours$DOWST ~ depdata.hours$LBFDGHPW, family = 'binomial')
+glm(depdata.type$DODEP ~ depdata.type$LBFDVPFT, family = 'binomial')
+
+
+#not significant Depression and Sex
+#glm(depdata.sex$DODEP ~ depdata.sex$DHH_SEX, family = 'binomial')
+#glm(depdata.sex$DOWST ~ depdata.sex$DHH_SEX, family = 'binomial')
+
+
+
+#depression and workstress
+dust(fit) %>%
+  sprinkle(col = 2:4, round = 3) %>%
+  sprinkle(col = 5, fn= quote(pvalString(value))) %>%
+  sprinkle_colnames(term = "Term",
+                    estimate = "Estimate",
+                    std.error = "SE",
+                    statistic = "Z-Statistic",
+                    p.value= "P-value") %>%
+  kable()%>%
+  kable_paper("striped",full_width = TRUE)
+
+#Depression and background
+dust(fit3) %>%
+  sprinkle(col = 2:4, round = 3) %>%
+  sprinkle(col = 5, fn= quote(pvalString(value))) %>%
+  sprinkle_colnames(term = "Term",
+                    estimate = "Estimate",
+                    std.error = "SE",
+                    statistic = "Z-Statistic",
+                    p.value= "P-value") %>%
+  kable()%>%
+  kable_paper("striped",full_width = TRUE)
+
+#Workstress and background
+dust(fit4) %>%
+  sprinkle(col = 2:4, round = 3) %>%
+  sprinkle(col = 5, fn= quote(pvalString(value))) %>%
+  sprinkle_colnames(term = "Term",
+                    estimate = "Estimate",
+                    std.error = "SE",
+                    statistic = "Z-Statistic",
+                    p.value= "P-value") %>%
+  kable()%>%
+  kable_paper("striped",full_width = TRUE)
+
+#Depression and Work hours
+dust(fit5) %>%
+  sprinkle(col = 2:4, round = 3) %>%
+  sprinkle(col = 5, fn= quote(pvalString(value))) %>%
+  sprinkle_colnames(term = "Term",
+                    estimate = "Estimate",
+                    std.error = "SE",
+                    statistic = "Z-Statistic",
+                    p.value= "P-value") %>%
+  kable()%>%
+  kable_paper("striped",full_width = TRUE)
+
+#Workstress and Work hours
+dust(fit6) %>%
+  sprinkle(col = 2:4, round = 3) %>%
+  sprinkle(col = 5, fn= quote(pvalString(value))) %>%
+  sprinkle_colnames(term = "Term",
+                    estimate = "Estimate",
+                    std.error = "SE",
+                    statistic = "Z-Statistic",
+                    p.value= "P-value") %>%
+  kable()%>%
+  kable_paper("striped",full_width = TRUE)
+
+#Workstress and Hours 
+dust(fit7) %>%
+  sprinkle(col = 2:4, round = 3) %>%
+  sprinkle(col = 5, fn= quote(pvalString(value))) %>%
+  sprinkle_colnames(term = "Term",
+                    estimate = "Estimate",
+                    std.error = "SE",
+                    statistic = "Z-Statistic",
+                    p.value= "P-value") %>%
+  kable()%>%
+  kable_paper("striped",full_width = TRUE)
+
+```
+
+```{r}
+
+#Frequency tables 
+
+library(sjPlot)
+library(sjmisc)
+library(sjlabelled)
+
+```
+
