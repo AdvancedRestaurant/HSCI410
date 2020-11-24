@@ -19,7 +19,8 @@ When you click the **Knit** button a document will be generated that includes bo
 library(dplyr)
 library(ggplot2)
 
-depdata <- select(x, ADM_RNO, DODEP, DOWST, DEPDVSEV, GEN_020, GEN_025,LBFDGHPW,LBFDVPFT,LBFDGOCG,CCC_195,CCC_200,GEO_PRV,DHH_SEX,DHHGMS,DHHGAGE,SDCDGCGT,GENDVHDI,GENDVMHI,INCDGPER,INCDGHH,SWL_005,SWL_015,GEN_015,ALCDVTTM,ALC_015,SMK_005,SMKDVSTY,HWTDGISW,WST_035,SLP_015,EHG2DVR3,SACDVTER,UCN_005,SUI_010)
+#33 variables 109659 individuals
+depdata <- select(x, ADM_RNO, DODEP, DOWST, DEPDVSEV,GEN_015,GEN_020, GEN_025,LBFDGHPW,LBFDVPFT,LBFDGOCG,CCC_195,CCC_200,GEO_PRV,DHH_SEX,DHHGMS,DHHGAGE,SDCDGCGT,GENDVHDI,GENDVMHI,INCDGPER,INCDGHH,SWL_005,SWL_015,ALCDVTTM,ALC_015,SMK_005,SMKDVSTY,HWTDGISW,WST_035,SLP_015,EHG2DVR3,SACDVTER,SUI_010)
 
 
 
@@ -204,9 +205,22 @@ scale20 <- function(x){
             x %in% c("Part-time")~1)
 }
 
+scale21<- function(x){
+  case_when(x %in% c("NOC Code first digit: 1, 3, 4, 5, 6")~0,
+            x %in% c("NOC Code first digit: 2")~2,
+            x %in% c("NOC Code first digit: 6")~3,
+            x %in% c("NOC Code first digit: 7")~4,
+            x %in% c("NOC Code first digit: 8, 9")~5,
+            x %in% c("Valid skip")~9,
+            x %in% c("Not stated")~9)
+}
+
+
 #Apply scale to data
 depdata$DODEP <- sapply(depdata$DODEP,scale9)
 depdata$DOWST<- sapply(depdata$DOWST, scale9)
+
+
 
 # depdata$DEPDVSEV <- sapply(depdata$DEPDVSEV,scale3)
 # depdata$GEN_020 <- sapply(depdata$GEN_020,scale7)
@@ -271,10 +285,11 @@ factor.work.sat <- factor(depdata$WST_070, levels = c(0,1,2,3,4))
 
 
 #Filtering out data
-
+#33 columns 54992
 depdata.hours <- depdata %>%
   filter(!LBFDGHPW %in% c("Not stated","Valid skip"))
 depdata.hours$LBFDGHPW <- as.numeric(depdata.hours$LBFDGHPW)
+
 
 depdata.race<- depdata %>%
   filter(!SDCDGCGT %in% c("Not stated","Valid skip"))
@@ -284,14 +299,12 @@ depdata.sex <- depdata
 depdata.type <- depdata %>%
   filter(!LBFDVPFT %in% c("Not stated","Valid skip"))
 
-bc<-x %>%
-  filter(GEO_PRV =="BRITISH COLUMBIA")
 
 #Tables for export
 tgroup%>%
   rename(Depression_Status = DODEP)
 
-fit <- glm(depdata$DODEP ~ depdata$DOWST, family = "binomial")
+fit <- glm(depdata.hours$DODEP ~ depdata.hours$DOWST, family = "binomial")
 
 fit3 <- glm(depdata.race$DODEP ~ depdata.race$SDCDGCGT, family ="binomial")
 fit4 <- glm(depdata.race$DOWST ~ depdata.race$SDCDGCGT, family ="binomial")
