@@ -18,7 +18,10 @@ When you click the **Knit** button a document will be generated that includes bo
 ```{r cars}
 library(dplyr)
 library(ggplot2)
-depdata <- select(x, ADM_RNO, DODEP, DOWST, DEPDVSEV, GEN_020, GEN_025, WSTDVSKI,WSTDVPSY,WSTDVJIN,WSTDVPSY,WSTDVAUT,WSTDVJST,WSTDVSOC,LBFDGHPW,LBFDVPFT,CCC_195,CCC_200,GEO_PRV,DHH_SEX,DHHGMS,DHHGAGE,GENDVHDI,GENDVMHI,INCDGPER,INCDGHH)
+
+depdata <- select(x, ADM_RNO, DODEP, DOWST, DEPDVSEV, GEN_020, GEN_025,LBFDGHPW,LBFDVPFT,LBFDGOCG,CCC_195,CCC_200,GEO_PRV,DHH_SEX,DHHGMS,DHHGAGE,SDCDGCGT,GENDVHDI,GENDVMHI,INCDGPER,INCDGHH,SWL_005,SWL_015,GEN_015,ALCDVTTM,ALC_015,SMK_005,SMKDVSTY,HWTDGISW,WST_035,SLP_015,EHG2DVR3,SACDVTER,UCN_005,SUI_010)
+
+
 
 #Recoding data from strings to numerical ranks from 0-1,9 is used to combine those who answered "Not stated" or "Valid skip"
 scale1 <- function(x){
@@ -227,8 +230,8 @@ depdata[depdata$LBFDGHPW == "Valid skip",]$LBFDGHPW = 0
 
 
 #adding extra data to data set
-deprace <- dplyr::select(x, ADM_RNO, SDCDGCGT)
-depdata <- left_join(depdata, deprace, by ="ADM_RNO")
+#deprace <- dplyr::select(x, ADM_RNO, SDCDGCGT)
+#depdata <- left_join(depdata, deprace, by ="ADM_RNO")
 
 
 
@@ -386,6 +389,8 @@ dust(fit7) %>%
 library(sjPlot)
 library(sjmisc)
 library(sjlabelled)
+
+
 
 ```
 
