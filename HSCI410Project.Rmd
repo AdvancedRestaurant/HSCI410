@@ -217,12 +217,69 @@ scale21<- function(x){
             x %in% c("Not stated")~9)
 }
 
+scale22 <- function(x){
+  case_when(x %in% c("Occasional drinker")~0,
+            x %in% c("Regular drinker")~1)
+}
+
+scale23 <- function(x){
+  case_when(x %in% c("Less than once a month")~0,
+            x %in% c("Once a month")~1,
+            x %in% c("2 to 3 times a month")~2,
+            x %in% c("Once a week")~3,
+            x %in% c("2 to 3 times a week")~4,
+            x %in% c("4 to 6 times a week")~5,
+            x %in% c("Every day")~6)
+}
+
+scale24<- function(x){
+  case_when(x %in% c("Lifetime abstainer (never smoked a whole cigarette)")~0,
+            x %in% c("Experimental smoker (at least 1 cig, non-smoker now)")~1,
+            x %in% c("Former occasional smoker (non-smoker now)")~1,
+            x %in% c("Former daily smoker (non-smoker now)")~1,
+            x %in% c("Current occasional smoker")~9,
+            x %in% c("Current daily smoker")~9,
+            x %in% c("Not stated")~9)
+}
+
+scale25<- function(x){
+  case_when(x %in% c("Normal weight")~0,
+            x %in% c("Underweight")~1,
+            x %in% c("Overweight")~9,
+            x %in% c("Obese - Class I, II, III")~9,
+            x %in% c("Not stated")~9)
+}
+
+scale26<- function(x){
+  case_when(x %in% c("Never")~0,
+            x %in% c("Rarely")~1,
+            x %in% c("Sometimes")~9,
+            x %in% c("Most of the time")~9,
+            x %in% c("Sometimes")~9,
+            x %in% c("All of the time")~9,
+            x %in% c("Valid skip")~9,
+            x %in% c("Not stated")~9)
+}
+
+scale27<- function(x){
+  case_when(x %in% c("Less than secondary school graduation")~0,
+            x %in% c("Secondary school graduation, no post-secondary education")~1,
+            x %in% c("Post-secondary certificate diploma or univ degree")~2,
+            x %in% c("Not stated")~9)
+}
+
+scale28<- function(x){
+  case_when(x %in% c("Not at all")~0,
+            x %in% c("Occasionally")~1,
+            x %in% c("Daily")~2)
+}
+
 
 #Apply scale to data
 depdata$DODEP <- sapply(depdata$DODEP,scale9)
 depdata$DOWST<- sapply(depdata$DOWST, scale9)
 
-#Renaming and working using this data set.
+#Renaming and working using this data set. This data set has individuals aged from 18-64. It has 39956 participants. Work satisfaction and job security not filtered out in this data set as >45000 individuals would have been dropped. A separate analysis will be done after filtering out those variables.
 depdata18to64 <- depdata1 %>%
   filter(!DHHGAGE %in% c("Age between 65 and 69","Age between 70 and 74"))
 
@@ -252,6 +309,30 @@ depdata18to64$DEPDVSEV <- sapply(depdata18to64$DEPDVSEV,scale3)
 depdata18to64$GEN_015 <- sapply(depdata18to64$GEN_015,scale1)
 depdata18to64$GEN_020 <- sapply(depdata18to64$GEN_020,scale7)
 depdata18to64$GEN_025 <- sapply(depdata18to64$GEN_025,scale7)
+depdata18to64$LBFDVPFT <- sapply(depdata18to64$LBFDVPFT,scale20)
+depdata18to64$LBFDGOCG <- sapply(depdata18to64$LBFDGOCG,scale21)
+depdata18to64$CCC_195 <- sapply(depdata18to64$CCC_195,scale9)
+depdata18to64$CCC_200 <- sapply(depdata18to64$CCC_200,scale9)
+depdata18to64$GEO_PRV <- sapply(depdata18to64$GEO_PRV,scale13)
+depdata18to64$DHH_SEX <- sapply(depdata18to64$DHH_SEX,scale12)
+
+depdata18to64$SDCDGCGT <- sapply(depdata18to64$SDCDGCGT,scale19)
+depdata18to64$GENDVHDI <- sapply(depdata18to64$GENDVHDI,scale1)
+depdata18to64$GENDVMHI <- sapply(depdata18to64$GENDVMHI,scale1)
+depdata18to64$INCDGPER <- sapply(depdata18to64$INCDGPER,scale5)
+depdata18to64$INCDGHH <- sapply(depdata18to64$INCDGHH,scale10)
+
+depdata18to64$ALCDVTTM <- sapply(depdata18to64$ALCDVTTM,scale22)
+depdata18to64$ALC_015 <- sapply(depdata18to64$ALC_015,scale23)
+depdata18to64$SMK_005 <- sapply(depdata18to64$SMK_005,scale28)
+depdata18to64$SMKDVSTY <- sapply(depdata18to64$SMKDVSTY,scale24)
+depdata18to64$HWTDGISW <- sapply(depdata18to64$HWTDGISW,scale25)
+depdata18to64$EHG2DVR3 <- sapply(depdata18to64$EHG2DVR3,scale27)
+
+
+#Which age grouping to use? 18-25 25-40 40-65
+#depdata18to64$DHHGAGE <- sapply(depdata18to64$DHHGAGE,scale7)
+
 
 
 #adding extra data to data set
@@ -322,7 +403,7 @@ depdata1 <- depdata.hours %>%
          #!SWL_005 %in% c("Valid skip", "Don't know","Refusal","Not stated"),
          #!SWL_015 %in% c("Valid skip", "Don't know","Refusal","Not stated"),
          !ALC_015 %in% c("Valid skip"),
-         !HWTDGISW %in% c("Valid skip"),
+         !HWTDGISW %in% c("Valid skip", "Not stated"),
          !SMKDVSTY %in% c("Not stated"))
          
 #Work satisfaction 
