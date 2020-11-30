@@ -401,16 +401,20 @@ factor.race <- factor(depdata18to64.test$SDCDGCGT, levels = c(0,1))
 #Work satisfaction 
 
 #Logistic regression looking at workstress and work hours (for 1 hour increase)
-dep.wrkhours <- glm(depdata18to64.factor$DODEP ~ depdata18to64.factor$LBFDGHPW, family = "binomial")
-exp(dep.wrkhours$coefficients)
+dep.wrkhours <- glm(depdata18to64.test$DODEP ~ depdata18to64.test$LBFDGHPW, family = "binomial")
+
 
 #Forward stepwise regression to determine variables to add 
-full <- glm(depdata18to64.factor$DODEP ~ depdata18to64.factor$LBFDGHPW, family = "binomial")
+full <- glm(depdata18to64.test$DODEP ~ depdata18to64.test$LBFDGHPW + depdata18to64.test$DOWST + factor.mentalhealth + factor.lifestress + factor.workstress + depdata18to64.test$LBFDVPFT + factor.worktype + depdata18to64.test$DHH_SEX + factor.martial + depdata18to64.test$SDCDGCGT + factor.perceivedhealth + factor.perceivedmenhealth + factor.incomepersonal + factor.incomehousehold + depdata18to64.test$ALCDVTTM + factor.alcfreq + factor.smkrtype + factor.smkstatus + factor.bmi + factor.edu, family = "binomial")
 
-null <- glm(depdata18to64.factor$DODEP ~ 1, family ='binomial')
+null <- glm(depdata18to64.test$DODEP ~ 1, family ='binomial')
 
 
 step(null, scope = list(lower=null, upper= full), direction="forward")
+
+#Suggested model after stepwise 
+
+dep.wrkhoursfull <-glm(formula = depdata18to64.test$DODEP ~ depdata18to64.test$DOWST + factor.martial + factor.alcfreq + factor.bmi + factor.lifestress + depdata18to64.test$LBFDGHPW + factor.smkstatus + factor.edu + factor.incomepersonal + factor.perceivedhealth + depdata18to64.test$SDCDGCGT + factor.mentalhealth + depdata18to64.test$LBFDVPFT + factor.incomehousehold + factor.worktype + depdata18to64.test$DHH_SEX, family = "binomial")
 
 #Tables for export
 tgroup%>%
