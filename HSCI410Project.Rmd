@@ -273,7 +273,10 @@ scale28<- function(x){
             x %in% c("Occasionally")~1,
             x %in% c("Daily")~2)
 }
-
+scale9b<- function(x){
+  case_when(x %in% c("1")~"Yes",
+            x %in% c("0")~"No")
+}
 
 #Apply scale to data
 depdata$DODEP <- sapply(depdata$DODEP,scale9)
@@ -285,7 +288,7 @@ depdata.hours <- depdata %>%
   filter(!LBFDGHPW %in% c("Not stated","Valid skip"))
 depdata.hours$LBFDGHPW <- as.numeric(depdata.hours$LBFDGHPW)
 
-#Filter out responses that are not stated #41179
+#Filter out responses that are not stated #39033
 depdata1 <- depdata.hours %>%
   filter(!LBFDGOCG %in% c("Not stated"),
          !INCDGHH %in% c("Not stated"),
@@ -306,10 +309,11 @@ depdata1 <- depdata.hours %>%
          #!SWL_015 %in% c("Valid skip", "Don't know","Refusal","Not stated"),
          !ALC_015 %in% c("Valid skip"),
          !HWTDGISW %in% c("Valid skip", "Not stated"),
-         !SMKDVSTY %in% c("Not stated"))
+         !SMKDVSTY %in% c("Not stated")
+         )
          
 
-#Renaming and working using this data set. This data set has individuals aged from 18-64. It has 38993 participants. Work satisfaction and job security not filtered out in this data set as >45000 individuals would have been dropped. A separate analysis will be done after filtering out those variables.
+#Renaming and working using this data set. This data set has individuals aged from 18-64. It has 36892 participants. Work satisfaction and job security not filtered out in this data set as >45000 individuals would have been dropped. A separate analysis will be done after filtering out those variables.
 depdata18to64 <- depdata1 %>%
   filter(!DHHGAGE %in% c("Age between 65 and 69","Age between 70 and 74"))
 
@@ -321,7 +325,7 @@ depdata18to64$GEN_020 <- sapply(depdata18to64$GEN_020,scale7)
 depdata18to64$GEN_025 <- sapply(depdata18to64$GEN_025,scale7)
 depdata18to64$LBFDVPFT <- sapply(depdata18to64$LBFDVPFT,scale20)
 depdata18to64$LBFDGOCG <- sapply(depdata18to64$LBFDGOCG,scale21)
-depdata18to64$CCC_dim195 <- sapply(depdata18to64$CCC_195,scale9)
+depdata18to64$CCC_195 <- sapply(depdata18to64$CCC_195,scale9)
 depdata18to64$CCC_200 <- sapply(depdata18to64$CCC_200,scale9)
 depdata18to64$GEO_PRV <- sapply(depdata18to64$GEO_PRV,scale13)
 depdata18to64$DHH_SEX <- sapply(depdata18to64$DHH_SEX,scale12)
@@ -357,7 +361,8 @@ depdata18to64.test <- depdata18to64 %>%
     DHHGAGE %in% c("Age between 50 and 54")~agebracket[3],
     DHHGAGE %in% c("Age between 55 and 59")~agebracket[3],
     DHHGAGE %in% c("Age between 60 and 64")~agebracket[3],
-    DHHGAGE %in% c("Age between 65 and 69")~agebracket[3]))
+    DHHGAGE %in% c("Age between 65 and 69")~agebracket[3])
+    )
 
 depdata18to64.test$agebracket <- factor(depdata18to64.test$agebracket,
                                           levels = agebracket,
@@ -378,6 +383,8 @@ depdata18to64.test$agebracket <- factor(depdata18to64.test$agebracket,
 library(kableExtra)
 library(pixiedust)
 library(MASS)
+library(magick)
+library(htmlTable)
 
 #Creating factors to for data analysis
 #factor.dep.severity <- factor(depdata18to64.factor$DEPDVSEV, levels = c(0,1,2,3,4,5))
@@ -405,128 +412,301 @@ dep.wrkhours <- glm(depdata18to64.test$DODEP ~ depdata18to64.test$LBFDGHPW, fami
 
 
 #Forward stepwise regression to determine variables to add 
-full <- glm(depdata18to64.test$DODEP ~ depdata18to64.test$LBFDGHPW + depdata18to64.test$DOWST + factor.mentalhealth + factor.lifestress + factor.workstress + depdata18to64.test$LBFDVPFT + factor.worktype + depdata18to64.test$DHH_SEX + factor.martial + depdata18to64.test$SDCDGCGT + factor.perceivedhealth + factor.perceivedmenhealth + factor.incomepersonal + factor.incomehousehold + depdata18to64.test$ALCDVTTM + factor.alcfreq + factor.smkrtype + factor.smkstatus + factor.bmi + factor.edu, family = "binomial")
+full <- glm(depdata18to64.test$DODEP ~ depdata18to64.test$LBFDGHPW + depdata18to64.test$DOWST  + factor.lifestress + factor.workstress + depdata18to64.test$LBFDVPFT + factor.worktype + depdata18to64.test$DHH_SEX + factor.martial + depdata18to64.test$SDCDGCGT + factor.incomehousehold + depdata18to64.test$ALCDVTTM + factor.alcfreq + factor.smkrtype + factor.smkstatus + factor.bmi + factor.edu + depdata18to64.test$agebracket, family = "binomial")
 
 null <- glm(depdata18to64.test$DODEP ~ 1, family ='binomial')
 
 
 step(null, scope = list(lower=null, upper= full), direction="forward")
 
-#Suggested model after stepwise 
+#Suggested model after step-wise 
 
-dep.wrkhoursfull <-glm(formula = depdata18to64.test$DODEP ~ depdata18to64.test$DOWST + factor.martial + factor.alcfreq + factor.bmi + factor.lifestress + depdata18to64.test$LBFDGHPW + factor.smkstatus + factor.edu + factor.incomepersonal + factor.perceivedhealth + depdata18to64.test$SDCDGCGT + factor.mentalhealth + depdata18to64.test$LBFDVPFT + factor.incomehousehold + factor.worktype + depdata18to64.test$DHH_SEX, family = "binomial")
+dep.wrkhoursfull <- glm(formula = depdata18to64.test$DODEP ~ depdata18to64.test$DOWST + factor.martial + factor.alcfreq + factor.bmi + factor.lifestress + depdata18to64.test$LBFDGHPW + factor.smkstatus + factor.edu + depdata18to64.test$agebracket + depdata18to64.test$DHH_SEX + depdata18to64.test$SDCDGCGT + factor.worktype + depdata18to64.test$LBFDVPFT, family = "binomial")
 
-#Tables for export
-tgroup%>%
-  rename(Depression_Status = DODEP)
+#testing workhours changing scale to 40 hours per week and 5 hour increasese 
+#workhours40 <- ((depdata18to64.test$LBFDGHPW - 40) / 5)
 
-fit <- glm(depdata.hours$DODEP ~ depdata.hours$DOWST, family = "binomial")
+#dep.wrkhours40 <- glm(formula = depdata18to64.test$DODEP ~ depdata18to64.test$DOWST + factor.martial + factor.alcfreq + factor.bmi + factor.lifestress + workhours40 + factor.smkstatus + factor.edu + depdata18to64.test$agebracket + depdata18to64.test$DHH_SEX + depdata18to64.test$SDCDGCGT + factor.worktype + depdata18to64.test$LBFDVPFT + factor.workstress, family = "binomial")
 
-fit3 <- glm(depdata.race$DODEP ~ depdata.race$SDCDGCGT, family ="binomial")
-fit4 <- glm(depdata.race$DOWST ~ depdata.race$SDCDGCGT, family ="binomial")
+#adding results to a data frame
+dep.results <- data.frame(coef(summary(dep.wrkhoursfull))[])
+
+#dropping z.value
+dep.results <- dep.results[-3]
+
+#adding Odds ratios for analysis 
+dep.results <- dep.results %>%
+  mutate(OR = exp(dep.results$Estimate[])
+         )
+
+#Confidence intervals 
+dep.resultsCI <- exp(confint(dep.wrkhoursfull)
+                     )
+
+#Combining confidence intervals with table. expon. results to show the confidence interval in Odds rather than log odds
+dep.resultsfull <- cbind(dep.results,dep.resultsCI)
+#dep.resultsfull[,5] <- exp(dep.resultsfull[,5])
+#dep.resultsfull[,6] <- exp(dep.resultsfull[,6])
 
 
-fit5<- glm(depdata.hours$DODEP ~ depdata.hours$LBFDGHPW, family = 'binomial')
-fit6<- glm(depdata.hours$DOWST ~ depdata.hours$LBFDGHPW, family = 'binomial')
-glm(depdata.type$DODEP ~ depdata.type$LBFDVPFT, family = 'binomial')
+#rounding results to 3 decimal places
+dep.resultsfull <- round(dep.resultsfull,3)
+
+#Renaming columns
+dep.resultsfull <- dep.resultsfull %>%
+  rename(
+    Standard_Error = Std..Error,
+    Adjusted_OR = OR,
+    Crude_OR = "2.5 %",
+    P_value = Pr...z..
+  )
 
 
-#not significant Depression and Sex
-#glm(depdata.sex$DODEP ~ depdata.sex$DHH_SEX, family = 'binomial')
-#glm(depdata.sex$DOWST ~ depdata.sex$DHH_SEX, family = 'binomial')
+
+#Renaming Rows 
+rownames(dep.resultsfull) <- c("Intercept", 
+              "Answered = Yes (n = 4247)",
+              "Common-law (n = 5741)",
+              "Widowed/Divorced/Separated (n = 4735)",
+              "Single (n = 10346)",
+              "Once a month (n = 3651)",
+              "2 to 3 times a month (n = 5498)",
+              "Once a week (n = 6627)",
+              "2 to 3 times a week (n = 9377)",
+              "4 to 6 times a week (n = 3091)",
+              "Every day (n = 2452)",
+              "Underweight (n = 548)",
+              "Overweight (n = 12678)",
+              "Obese - Class I, II, III (n = 8133)",
+              "Not very stressful (n = 7635)",
+              "A bit stressful (n = 17097)",
+              "Quite a bit stressful (n = 8551)",
+              "Extremely stressful (n = 1102)",
+              "Hours worked per week",
+              "Experimental smoker (at least 1 cig, non-smoker now) (n = 5956)",
+              "Former occasional smoker (non-smoker now) (n = 1171)",
+              "Former daily smoker (non-smoker now) (n = 8538)",
+              "Current occasional smoker (n = 2210)",
+              "Current daily smoker (n = 5647)",
+              "Secondary school graduation, no post-secondary education (n = 7937)",
+              "Post-secondary certificate diploma or university degree (n = 26605)",
+              "Ages (30-49) (n = 17506)",
+              "Ages (50-69) (n = 12334)",
+              "Male (n = 18812)",
+              "Non-white (Aboriginal or Other Visible Minority) (n =4025)",
+              "Natural and appled science (NOC2) (n = 6086)",
+              "Sales and service (NOC6) (n = 7344)",
+              "Trades and equipment ocupations (NOC7) (n = 5390)",
+              "Agriculture and Natural resources (NOC 8&9) (n = 2498)",
+              "Part-time Work (n = 4819)")
+
+#Combining OR and Conf int for table
+Adjusted.OR <- c("0.866 (0.715 - 1.049)",
+                 "5.264e+07 (2.182e+29 - 7.108e+32)",
+                 "0.377 (0.351 - 0.405)",
+                 "0.776 (0.723 - 0.834)",
+                 "0.608 (0.572 - 0.647)",
+                 "0.822 (0.752 - 0.899)",
+                 "0.871 (0.804 - 0.944)",
+                 "0.731 (0.676 - 0.790)",
+                 "0.692 (0.643 - 0.745)",
+                 "0.647 (0.586 - 0.713)",
+                 "0.771 (0.694 - 0.856)",
+                 "1.022 (0.848 - 1.229)",
+                 "1.111 (1.054 - 1.172)",
+                 "1.334 (1.255 - 1.419)",
+                 "1.101 (0.996 - 1.217)",
+                 "1.073 (0.977 - 1.178)",
+                 "0.849 (0.768 - 0.938)",
+                 "1.026 (0.877 - 1.200)",
+                 "1.006 (1.003 - 1.008)",
+                 "1.002 (0.936 - 1.071)",
+                 "0.982 (0.860 - 1.122)",
+                 "0.905 (0.850 - 0.965)",
+                 "0.888 (0.803 - 0.982)",
+                 "1.174 (1.092 - 1.262)",
+                 "1.341 (1.207 - 1.490)",
+                 "1.303 (1.181 - 1.441)",
+                 "0.830 (0.774 - 0.890)",
+                 "0.884 (0.819 - 0.955)",
+                 "0.913 (0.866 - 0.962)",
+                 "0.886 (0.823 - 0.954)",
+                 "0.953 (0.891 - 1.017)",
+                 "1.052 (0.986 - 1.122)",
+                 "0.964 (0.893 - 1.040)",
+                 "1.139 (1.035 - 1.255)",
+                 "0.876 (0.801 - 0.957)")
+
+dep.resultsfull[,4] <- Adjusted.OR
+
+#getting crude OR and confint
+workstress.crude <- glm(depdata18to64.test$DODEP ~ depdata18to64.test$DOWST, family = "binomial")
+marital.crude <- glm(depdata18to64.test$DODEP ~ factor.martial, family = "binomial")
+alcfreq.crude <- glm(depdata18to64.test$DODEP ~ factor.alcfreq, family = "binomial")
+bmi.crude <- glm(depdata18to64.test$DODEP ~ factor.bmi, family = "binomial")
+lifestress.crude <- glm(depdata18to64.test$DODEP ~ factor.lifestress, family = "binomial")
+workhours.crude <- glm(depdata18to64.test$DODEP ~ depdata18to64.test$LBFDGHPW, family = "binomial")
+smkstatus.crude <- glm(depdata18to64.test$DODEP ~ factor.smkstatus, family = "binomial")
+edu.crude <- glm(depdata18to64.test$DODEP ~ factor.edu, family = "binomial")
+age.crude <- glm(depdata18to64.test$DODEP ~ depdata18to64.test$agebracket, family = "binomial")
+sex.crude <- glm(depdata18to64.test$DODEP ~ depdata18to64.test$DHH_SEX, family = "binomial")
+rb.crude <- glm(depdata18to64.test$DODEP ~ depdata18to64.test$SDCDGCGT, family = "binomial")
+worktype.crude <- glm(depdata18to64.test$DODEP ~ factor.worktype, family = "binomial")
+pt.crude <- glm(depdata18to64.test$DODEP ~ depdata18to64.test$LBFDVPFT, family = "binomial")
+
+crude.coef <- c(coef(workstress.crude),
+                coef(marital.crude),
+                coef(alcfreq.crude),
+                coef(bmi.crude),
+                coef(lifestress.crude),
+                coef(workhours.crude),
+                coef(smkstatus.crude),
+                coef(edu.crude),
+                coef(age.crude),
+                coef(sex.crude),
+                coef(rb.crude),
+                coef(worktype.crude),
+                coef(pt.crude)
+                )
+
+Crude.OR <- c("-",
+              "5.797e+07 (1.705e+30 - 1.1300e+34)",
+              "0.384 (0.360 - 0.409)",
+              "0.777 (0.728 - 0.829)",
+              "0.640 (0.609 - 0.673)",
+              "0.822 (0.757 - 0.892)",
+              "0.869 (0.808 - 0.935)",
+              "0.738 (0.688 - 0.791)",
+              "0.647 (0.606 - 0.690)",
+              "0.586 (0.537 - 0.639)",
+              "0.698 (0.635 - 0.766)",
+              "0.958 (0.806 - 1.136)",
+              "1.183 (1.129 - 1.240)",
+              "1.523 (1.443 - 1.608)",
+              "1.085 (0.992 - 1.188)",
+              "1.059 (0.974 - 1.152)",
+              "0.833 (0.762 - 0.911)",
+              "1.037 (0.900 - 1.195)",
+              "1.008 (1.006 - 1.009)",
+              "0.972 (0.914 - 1.033)",
+              "0.974 (0.864 - 1.098)",
+              "0.918 (0.870 - 0.970)",
+              "0.775 (0.708 - 0.849)",
+              "1.082 (1.017 - 1.151)",
+              "1.243 (1.134 - 1.363)",
+              "1.034 (0.950 - 1.125)",
+              "1.013 (0.958 - 1.070)",
+              "1.127 (1.063 - 1.195)",
+              "0.980 (0.941 - 1.021)",
+              "0.915 (0.857 - 0.977)",
+              "0.952 (0.898 - 1.011)",
+              "1.028 (0.898 - 1.086)",
+              "1.028 (0.972 - 1.093)",
+              "1.131 (0.966 - 1.231)",
+              "0.833 (0.784 - 0.886)")
+
+dep.resultsfull[,5] <- Crude.OR
 
 
+dep.resultsfull <- dep.resultsfull[1:5]
+dep.resultsfull[,3] <- round(dep.results[,3],3)
 
-#depression and workstress
-dust(fit) %>%
-  sprinkle(col = 2:4, round = 3) %>%
-  sprinkle(col = 5, fn= quote(pvalString(value))) %>%
-  sprinkle_colnames(term = "Term",
-                    estimate = "Estimate",
-                    std.error = "SE",
-                    statistic = "Z-Statistic",
-                    p.value= "P-value") %>%
-  kable()%>%
-  kable_paper("striped",full_width = TRUE)
 
-#Depression and background
-dust(fit3) %>%
-  sprinkle(col = 2:4, round = 3) %>%
-  sprinkle(col = 5, fn= quote(pvalString(value))) %>%
-  sprinkle_colnames(term = "Term",
-                    estimate = "Estimate",
-                    std.error = "SE",
-                    statistic = "Z-Statistic",
-                    p.value= "P-value") %>%
-  kable()%>%
-  kable_paper("striped",full_width = TRUE)
+#table for export
+dep.resultsfull %>% 
+  kbl(caption = "This is a title placeholder to be changed later") %>%
+  kable_paper("striped",full_width = FALSE,position = "center") %>%
+  #add_header_above(c("","", "","","", "95% Confidence Interval (log odds)"=2))%>%
+  pack_rows("Workstress", 2,2,label_row_css = "background-color: #666; color: #fff;") %>%
+  pack_rows("Martial Status (Reference = Married) n = 16097", 3,5,label_row_css = "background-color: #666; color: #fff;") %>%
+  pack_rows("Alcohol Consumption Frequency (Reference = <1 per month) n = 6196", 6,11,label_row_css = "background-color: #666; color: #fff;") %>%
+  pack_rows("BMI (Reference = Normal Weight) n = 15533", 12,14,label_row_css = "background-color: #666; color: #fff;") %>%
+  pack_rows("Life Stress (Reference = Not at all stressful) n = 2507", 15,18,label_row_css = "background-color: #666; color: #fff;") %>%
+  pack_rows("Working Hours", 19,19,label_row_css = "background-color: #666; color: #fff;") %>%
+  pack_rows("Smoking Status (Reference =Never smoked) n = 13370", 20,24,label_row_css = "background-color: #666; color: #fff;") %>%
+  pack_rows("Education (Reference =Less than high school) n = 2350", 25,26,label_row_css = "background-color: #666; color: #fff;") %>%
+  pack_rows("Age (Reference = Ages (18 -29) n = 7052", 27,28,label_row_css = "background-color: #666; color: #fff;") %>%
+  pack_rows("Sex", 29,29,label_row_css = "background-color: #666; color: #fff;") %>%
+  pack_rows("Racial Background (Reference = White) n = 32866", 30,30,label_row_css = "background-color: #666; color: #fff;") %>%
+  pack_rows("NOC Work classifcation (Reference =NOC Codes 1,3,4,5,6) n = 15574", 31,34,label_row_css = "background-color: #666; color: #fff;") %>%
+  pack_rows("Full-time/Part-time work", 35,35,label_row_css = "background-color: #666; color: #fff;") %>%
+  footnote(general = "OR = Odds Ratio",
+           number = "Number of individuals (n) in study = 36892",
+           general_title = "General:",
+           title_format = c("italic","underline")
+           ) %>%
+  column_spec(4, 
+              bold = T, 
+              color = ifelse(dep.resultsfull$P_value > 0.05, "red","grey37")
+              )
+  
 
-#Workstress and background
-dust(fit4) %>%
-  sprinkle(col = 2:4, round = 3) %>%
-  sprinkle(col = 5, fn= quote(pvalString(value))) %>%
-  sprinkle_colnames(term = "Term",
-                    estimate = "Estimate",
-                    std.error = "SE",
-                    statistic = "Z-Statistic",
-                    p.value= "P-value") %>%
-  kable()%>%
-  kable_paper("striped",full_width = TRUE)
-
-#Depression and Work hours
-dust(fit5) %>%
-  sprinkle(col = 2:4, round = 3) %>%
-  sprinkle(col = 5, fn= quote(pvalString(value))) %>%
-  sprinkle_colnames(term = "Term",
-                    estimate = "Estimate",
-                    std.error = "SE",
-                    statistic = "Z-Statistic",
-                    p.value= "P-value") %>%
-  kable()%>%
-  kable_paper("striped",full_width = TRUE)
-
-#Workstress and Work hours
-dust(fit6) %>%
-  sprinkle(col = 2:4, round = 3) %>%
-  sprinkle(col = 5, fn= quote(pvalString(value))) %>%
-  sprinkle_colnames(term = "Term",
-                    estimate = "Estimate",
-                    std.error = "SE",
-                    statistic = "Z-Statistic",
-                    p.value= "P-value") %>%
-  kable()%>%
-  kable_paper("striped",full_width = TRUE)
-
-#Workstress and Hours 
-dust(fit7) %>%
-  sprinkle(col = 2:4, round = 3) %>%
-  sprinkle(col = 5, fn= quote(pvalString(value))) %>%
-  sprinkle_colnames(term = "Term",
-                    estimate = "Estimate",
-                    std.error = "SE",
-                    statistic = "Z-Statistic",
-                    p.value= "P-value") %>%
-  kable()%>%
-  kable_paper("striped",full_width = TRUE)
 
 ```
 
 ```{r}
+library(hrbrthemes)
+library(gridExtra)
+library(grid)
+library(summarytools)
 
-#Frequency tables 
+depdata.graph <- depdata1 %>%
+  filter(!DHHGAGE %in% c("Age between 65 and 69","Age between 70 and 74"))
 
-library(sjPlot)
-library(sjmisc)
-library(sjlabelled)
+#18812
+depdata.male <- depdata.graph %>%
+  filter(DHH_SEX == "Male")
+#18080
+depdata.female <- depdata.graph %>%
+  filter(DHH_SEX == "Female")
 
-library(ggiraph)
-library(ggiraphExtra)
+malehours <- data.frame(x = depdata.male$LBFDGHPW)
+femalehours <- data.frame(x = depdata.female$LBFDGHPW)
+allhours <- data.frame(x=depdata.graph$LBFDGHPW)
+colours <- c("Male" = "#33ccff", "Female" = "#ff99ff")
 
-ggPredict(fit5,se=TRUE,interactive=TRUE,digits=3)
+mfhours <-ggplot()+
+  aes(x=x)+
+  geom_histogram(data = malehours, fill = "#33ccff", alpha = 0.6, binwidth = 12) +
+  geom_histogram(data = femalehours, fill ="#ff99ff", alpha = 0.6, binwidth = 12)+
+  xlab("Hours worked (weekly)") +
+  ylab("Frequency")
+  
+mfhours + theme(panel.grid.major = element_blank(),
+          axis.ticks = element_blank())
+
+depdata.summary <- depdata1 %>%
+  filter(!DHHGAGE %in% c("Age between 65 and 69","Age between 70 and 74"))
 
 
+depdata.summary18to64 <- depdata.summary %>%
+  filter(!DHHGAGE %in% c("Age between 65 and 69","Age between 70 and 74"))
 
+depdata.summary <- dplyr::select(depdata.summary18to64, DODEP,DEPDVSEV,LBFDGHPW, LBFDVPFT, LBFDGOCG,GEO_PRV,DHH_SEX,DHHGMS,DHHGAGE,SDCDGCGT,INCDGHH,ALCDVTTM,ALC_015,SMKDVSTY,HWTDGISW,EHG2DVR3)
 
+depdata.summary$DODEP <- sapply(depdata.summary$DODEP,scale9b)
 
+depdata.summary <- depdata.summary %>%
+  rename(
+    Depression = DODEP,
+    Depression_Severity = DEPDVSEV,
+    Workhours = LBFDGHPW,
+    Part_Fulltime_Work = LBFDVPFT,
+    Work_type = LBFDGOCG,
+    Location = GEO_PRV,
+    Sex = DHH_SEX,
+    Martial_Status = DHHGMS,
+    Age = DHHGAGE,
+    Racial_background = SDCDGCGT,
+    Household_income = INCDGHH,
+    Drink_type = ALCDVTTM,
+    Drink_frequency = ALC_015,
+    Smoking_status = SMKDVSTY,
+    BMI = HWTDGISW,
+    Education = EHG2DVR3
+  )
+
+view(dfSummary(depdata.summary, plain.ascii = FALSE, style = "grid", 
+          graph.magnif = 0.75, valid.col = FALSE, tmp.img.dir = "/tmp"))
 ```
 
