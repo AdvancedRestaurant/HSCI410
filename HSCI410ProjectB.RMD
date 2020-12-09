@@ -16,6 +16,9 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r}
+library(dplyr)
+library(MASS)
+library(ggplot2)
 
 depdata <- dplyr::select(x, ADM_RNO, DODEP, DOWST, DEPDVSEV,GEN_015,GEN_020, GEN_025,LBFDGHPW,LBFDVPFT,LBFDGOCG,CCC_195,CCC_200,GEO_PRV,DHH_SEX,DHHGMS,DHHGAGE,SDCDGCGT,GENDVHDI,GENDVMHI,INCDGPER,INCDGHH,SWL_005,SWL_015,ALCDVTTM,ALC_015,SMK_005,SMKDVSTY,HWTDGISW,WST_035,SLP_015,EHG2DVR3,SACDVTER,SUI_010,WSTDVSKI,WSTDVPSY,WSTDVJIN,WSTDVPHY,WSTDVAUT,WSTDVJST,WSTDVSOC)
 
@@ -75,7 +78,7 @@ scale6 <- function(x){
             x %in% c("Don’t know")~9,
             x %in% c("Refusal")~9,
             x %in% c("Not stated")~9)
-
+  
 }
 
 scale7 <- function(x){
@@ -88,7 +91,7 @@ scale7 <- function(x){
             x %in% c("Refusal")~9,
             x %in% c("Valid skip")~9,
             x %in% c("Not stated")~9)
-            
+  
 }
 
 scale8 <- function(x){
@@ -312,8 +315,8 @@ depdata1 <- depdata.hours %>%
          !WSTDVAUT %in% c("Not stated","Valid skip"),
          !WSTDVJST %in% c("Not stated","Valid skip","(Other)"),
          !WSTDVSOC %in% c("Not stated","Valid skip")
-         )
-         
+  )
+
 
 
 #3588 respondents 
@@ -354,7 +357,7 @@ depdata18to64.test <- depdata18to64 %>%
     DHHGAGE %in% c("Age between 55 and 59")~agebracket[3],
     DHHGAGE %in% c("Age between 60 and 64")~agebracket[3],
     DHHGAGE %in% c("Age between 65 and 69")~agebracket[3])
-    )
+  )
 
 depdata18to64.test <- depdata18to64.test %>%
   mutate(groupdep = case_when(
@@ -364,7 +367,7 @@ depdata18to64.test <- depdata18to64.test %>%
     DEPDVSEV %in% c("Moderate depression")~groupdep[2],
     DEPDVSEV %in% c("Moderately severe depression")~groupdep[2],
     DEPDVSEV %in% c("Severe depression")~groupdep[2])
-    )
+  )
 
 depdata18to64.test <- depdata18to64.test %>%
   mutate(Work_Stress = case_when(
@@ -373,7 +376,7 @@ depdata18to64.test <- depdata18to64.test %>%
     GEN_025 %in% c("A bit stressful")~wrkstress[2],
     GEN_025 %in% c("Quite a bit stressful")~wrkstress[3],
     GEN_025 %in% c("Extremely stressful")~wrkstress[3])
-    )
+  )
 
 depdata18to64.test <- depdata18to64.test %>%
   mutate(Life_stress = case_when(
@@ -382,7 +385,7 @@ depdata18to64.test <- depdata18to64.test %>%
     GEN_020 %in% c("A bit stressful")~lifestress[2],
     GEN_020 %in% c("Quite a bit stressful")~lifestress[3],
     GEN_020 %in% c("Extremely stressful")~lifestress[3])
-    )
+  )
 
 # This variable indicates the respondent’s task variety at their main work in the past 12 months. It is based on questions about
 # whether the respondent was required to keep learning new things, whether his/her job required a high level of skill and
@@ -411,7 +414,7 @@ depdata18to64.test <- depdata18to64.test %>%
     WSTDVSKI %in% c("11")~stress.cat[3],
     WSTDVSKI %in% c("12")~stress.cat[3],
     WSTDVSKI %in% c("13")~stress.cat[3])
-    )
+  )
 
 
 # This variable indicates whether the respondent is free from conflicting demands that others make and if their main job in the
@@ -433,7 +436,7 @@ depdata18to64.test <- depdata18to64.test %>%
     WSTDVPSY %in% c("7")~stress.cat[3],
     WSTDVPSY %in% c("8")~stress.cat[3],
     WSTDVPSY %in% c("9")~stress.cat[3])
-    )
+  )
 
 # This variable indicates how the respondent feels about their level of job security in their main job.
 # Respondents less than 15 years old or more than 75 years old and respondents who have not worked at a job or business at
@@ -449,7 +452,7 @@ depdata18to64.test <- depdata18to64.test %>%
     WSTDVJIN %in% c("3")~stress.cat[3],
     WSTDVJIN %in% c("4")~stress.cat[3],
     WSTDVJIN %in% c("5")~stress.cat[3])
-    )
+  )
 
 
 #This variable indicates whether the main job in the past 12 months requires a lot of physical effort.
@@ -465,7 +468,7 @@ depdata18to64.test <- depdata18to64.test %>%
     WSTDVPHY %in% c("3")~stress.cat[3],
     WSTDVPHY %in% c("4")~stress.cat[3],
     WSTDVPHY %in% c("5")~stress.cat[3])
-    )
+  )
 
 # This variable indicates whether the respondent’s main job in the past 12 months allows them freedom in how to do their job
 # and if they have a lot of say in what happens with regard to their job. This measure can be used to assess the extent to which
@@ -487,7 +490,7 @@ depdata18to64.test <- depdata18to64.test %>%
     WSTDVAUT %in% c("7")~stress.cat[3],
     WSTDVAUT %in% c("8")~stress.cat[3],
     WSTDVAUT %in% c("9")~stress.cat[3])
-    )
+  )
 
 # This variable indicates the social support available to the respondent at his/her main job in the past 12 months. It is based on
 # questions about whether or not the respondent's supervisor and the people the respondent worked with were helpful in getting
@@ -514,47 +517,47 @@ depdata18to64.test <- depdata18to64.test %>%
     WSTDVSOC %in% c("11")~stress.cat[3],
     WSTDVSOC %in% c("12")~stress.cat[3],
     WSTDVSOC %in% c("13")~stress.cat[3])
-    )
+  )
 
 depdata18to64.test$agebracket <- factor(depdata18to64.test$agebracket,
-                                          levels = agebracket,
-                                          ordered = FALSE)
+                                        levels = agebracket,
+                                        ordered = FALSE)
 
 depdata18to64.test$groupdep <- factor(depdata18to64.test$groupdep,
-                                          levels = groupdep,
-                                          ordered = FALSE)
+                                      levels = groupdep,
+                                      ordered = FALSE)
 
 depdata18to64.test$Work_Stress <- factor(depdata18to64.test$Work_Stress,
-                                          levels = wrkstress,
-                                          ordered = FALSE)
+                                         levels = wrkstress,
+                                         ordered = FALSE)
 
 depdata18to64.test$Life_stress <- factor(depdata18to64.test$Life_stress,
-                                          levels = lifestress,
-                                          ordered = FALSE)
+                                         levels = lifestress,
+                                         ordered = FALSE)
 
 depdata18to64.test$wrkstress.skill <- factor(depdata18to64.test$wrkstress.skill,
-                                          levels = stress.cat,
-                                          ordered = FALSE)
+                                             levels = stress.cat,
+                                             ordered = FALSE)
 
 depdata18to64.test$wrkstress.psyc <- factor(depdata18to64.test$wrkstress.psyc,
-                                          levels = stress.cat,
-                                          ordered = FALSE)
+                                            levels = stress.cat,
+                                            ordered = FALSE)
 
 depdata18to64.test$wrkstress.security <- factor(depdata18to64.test$wrkstress.security,
-                                          levels = stress.cat,
-                                          ordered = FALSE)
+                                                levels = stress.cat,
+                                                ordered = FALSE)
 
 depdata18to64.test$wrkstress.authority <- factor(depdata18to64.test$wrkstress.authority,
-                                          levels = stress.cat,
-                                          ordered = FALSE)
+                                                 levels = stress.cat,
+                                                 ordered = FALSE)
 
 depdata18to64.test$wrkstress.social <- factor(depdata18to64.test$wrkstress.social,
-                                          levels = stress.cat,
-                                          ordered = FALSE)
+                                              levels = stress.cat,
+                                              ordered = FALSE)
 
 depdata18to64.test$wrkstress.physical <- factor(depdata18to64.test$wrkstress.physical,
-                                          levels = stress.cat,
-                                          ordered = FALSE)
+                                                levels = stress.cat,
+                                                ordered = FALSE)
 
 
 #Converting working data set string data to numerical data using scales for analysis.
@@ -598,7 +601,6 @@ depdata18to64.test$EHG2DVR3 <- sapply(depdata18to64.test$EHG2DVR3,scale27)
 ```{r}
 library(kableExtra)
 library(pixiedust)
-library(MASS)
 library(magick)
 library(htmlTable)
 
@@ -624,7 +626,12 @@ factor.race <- factor(depdata18to64.test$SDCDGCGT, levels = c(0,1))
 dep.wrkhours <- glm(depdata18to64.test$groupdep ~ depdata18to64.test$LBFDGHPW, family = "binomial")
 
 #Forward stepwise regression to determine variables to add 
-full <- glm(depdata18to64.test$groupdep ~ depdata18to64.test$LBFDGHPW + depdata18to64.test$Work_Stress  + depdata18to64.test$Life_stress + depdata18to64.test$LBFDVPFT + factor.worktype + depdata18to64.test$DHH_SEX + factor.martial + depdata18to64.test$SDCDGCGT + factor.incomehousehold + depdata18to64.test$ALCDVTTM + factor.alcfreq + factor.smkrtype + factor.smkstatus + factor.bmi + factor.edu + depdata18to64.test$agebracket + depdata18to64.test$wrkstress.skill + depdata18to64.test$wrkstress.psyc + depdata18to64.test$wrkstress.security + depdata18to64.test$wrkstress.physical + depdata18to64.test$wrkstress.authority + depdata18to64.test$wrkstress.social, family = "binomial")
+full <- glm(depdata18to64.test$groupdep ~ depdata18to64.test$LBFDGHPW + depdata18to64.test$Work_Stress  + depdata18to64.test$Life_stress + 
+              depdata18to64.test$LBFDVPFT + factor.worktype + depdata18to64.test$DHH_SEX + factor.martial + depdata18to64.test$SDCDGCGT + 
+              factor.incomehousehold + depdata18to64.test$ALCDVTTM + factor.alcfreq + factor.smkrtype + factor.smkstatus + factor.bmi + 
+              factor.edu + depdata18to64.test$agebracket + depdata18to64.test$wrkstress.skill + depdata18to64.test$wrkstress.psyc + 
+              depdata18to64.test$wrkstress.security + depdata18to64.test$wrkstress.physical + depdata18to64.test$wrkstress.authority + 
+              depdata18to64.test$wrkstress.social, family = "binomial")
 
 null <- glm(depdata18to64.test$groupdep ~ 1, family ='binomial')
 
@@ -635,8 +642,9 @@ step(null, scope = list(lower=null, upper= full), direction="forward")
 #end AIC 1359
 
 dep.wrkhoursfull<- glm(formula = depdata18to64.test$groupdep ~ depdata18to64.test$LBFDGHPW + depdata18to64.test$wrkstress.skill + 
-    depdata18to64.test$wrkstress.security + depdata18to64.test$wrkstress.authority + depdata18to64.test$wrkstress.social + 
-    factor.incomehousehold + depdata18to64.test$agebracket +depdata18to64.test$SDCDGCGT + factor.smkrtype + factor.bmi + depdata18to64.test$Life_stress, family = "binomial")
+                         depdata18to64.test$wrkstress.security + depdata18to64.test$wrkstress.authority + depdata18to64.test$wrkstress.social + 
+                         factor.incomehousehold + depdata18to64.test$agebracket +depdata18to64.test$SDCDGCGT + factor.smkrtype + factor.bmi + 
+                         depdata18to64.test$Life_stress, family = "binomial")
 
 summary(dep.wrkhoursfull)
 
@@ -659,11 +667,11 @@ dep.results <- dep.results[-3]
 #adding Odds ratios for analysis 
 dep.results <- dep.results %>%
   mutate(OR = exp(dep.results$Estimate[])
-         )
+  )
 
 #Confidence intervals 
 dep.resultsCI <- exp(confint(dep.wrkhoursfull)
-                     )
+)
 
 #Combining confidence intervals with table. expon. results to show the confidence interval in Odds rather than log odds
 dep.resultsfull <- cbind(dep.results,dep.resultsCI)
@@ -756,30 +764,30 @@ dep.resultsfullcrude <- round(dep.resultsfullcrude,3)
 
 #Renaming Rows 
 rownames(dep.resultsfull) <- c("Intercept",
-              "Hours worked per week",
-              "Medium skill",
-              "Low skill",
-              "Job security 2,3",
-              "Job security 4,5",
-              "Work authority 3,4,5",
-              "Work authority 6,7,8,9",
-              "Social support 5,6,7,8",
-              "Social support 9,10,11,12,13",
-              "20,000 to $39,999",
-              "40,000 to $59,999",
-              "60,000 to $79,999",
-              "80,000 or more",
-              "Age 30 - 49",
-              "Age 50 - 64",
-              "Non-white (Aboriginal or Other Visible Minority)",
-              "Occasional smoker",
-              "Daily smoker",
-              "Underweight",
-              "Overweight",
-              "Obese - Class I, II, III",
-              "Minimal Life stress",
-              "High Life stress"
-              )
+                               "Hours worked per week",
+                               "Medium skill",
+                               "Low skill",
+                               "Job security 2,3",
+                               "Job security 4,5",
+                               "Work authority 3,4,5",
+                               "Work authority 6,7,8,9",
+                               "Social support 5,6,7,8",
+                               "Social support 9,10,11,12,13",
+                               "20,000 to $39,999",
+                               "40,000 to $59,999",
+                               "60,000 to $79,999",
+                               "80,000 or more",
+                               "Age 30 - 49",
+                               "Age 50 - 64",
+                               "Non-white (Aboriginal or Other Visible Minority)",
+                               "Occasional smoker",
+                               "Daily smoker",
+                               "Underweight",
+                               "Overweight",
+                               "Obese - Class I, II, III",
+                               "Minimal Life stress",
+                               "High Life stress"
+)
 
 Adjusted.OR <- c("0.032 (0.008 - 0.111)",
                  "0.980 (0.969 - 0.991)",
@@ -862,14 +870,14 @@ dep.resultsfull %>%
   pack_rows("BMI", 20,22,label_row_css = "background-color: #666; color: #fff;") %>%
   pack_rows("Life Stress", 23,24,label_row_css = "background-color: #666; color: #fff;") %>%
   footnote(general = "OR = Odds Ratio",
-            number = c("Number of individuals (n) in study = 36892","Estimate, Standard Error and, P value are based off adjusted model"),
-            general_title = "General:",
-            title_format = c("italic","underline")
-            ) %>%
-   column_spec(4,
-               bold = T, 
-               color = ifelse(dep.resultsfull$Pvalue > 0.05, "red","grey")
-               )
+           number = c("Number of individuals (n) in study = 36892","Estimate, Standard Error and, P value are based off adjusted model"),
+           general_title = "General:",
+           title_format = c("italic","underline")
+  ) %>%
+  column_spec(4,
+              bold = T, 
+              color = ifelse(dep.resultsfull$Pvalue > 0.05, "red","grey")
+  )
 ```
 
 ```{r}
@@ -881,10 +889,10 @@ library(summarytools)
 depdata.graph <- depdata1 %>%
   filter(!DHHGAGE %in% c("Age between 65 and 69","Age between 70 and 74"))
 
-#18812
+#1756
 depdata.male <- depdata.graph %>%
   filter(DHH_SEX == "Male")
-#18080
+#1677
 depdata.female <- depdata.graph %>%
   filter(DHH_SEX == "Female")
 
@@ -899,41 +907,440 @@ mfhours <-ggplot()+
   geom_histogram(data = femalehours, fill ="#ff99ff", alpha = 0.6, binwidth = 12)+
   xlab("Hours worked (weekly)") +
   ylab("Frequency")
-  
+
 mfhours + theme(panel.grid.major = element_blank(),
-          axis.ticks = element_blank())
+                axis.ticks = element_blank())
 
 
 
 
-depdata.summary <- dplyr::select(depdata.summary, DODEP,DEPDVSEV,LBFDGHPW, LBFDVPFT, LBFDGOCG,GEO_PRV,DHH_SEX,DHHGMS,DHHGAGE,SDCDGCGT,INCDGHH,ALCDVTTM,ALC_015,SMKDVSTY,HWTDGISW,EHG2DVR3)
+depdata.summary <- dplyr::select(depdata18to64, ADM_RNO, DEPDVSEV,LBFDGHPW, LBFDVPFT, LBFDGOCG,
+                                 DHH_SEX,DHHGMS,DHHGAGE,SDCDGCGT,INCDGHH,GENDVHDI, GENDVMHI,
+                                 ALCDVTTM, SMK_005,SMKDVSTY,HWTDGISW,EHG2DVR3)
 
-depdata.summary <- depdata1 %>%
-  filter(!DHHGAGE %in% c("Age between 65 and 69","Age between 70 and 74"))
+depdata.summary1 <- dplyr:: select(depdata18to64.test, ADM_RNO, agebracket,Work_Stress,groupdep)
+depdata.summary1 <- dplyr::left_join(depdata.summary, depdata.summary1, by= "ADM_RNO")
 
-depdata.summary$DODEP <- sapply(depdata.summary$DODEP,scale9b)
+# depdata.summary <- depdata1 %>%
+#   filter(!DHHGAGE %in% c("Age between 65 and 69","Age between 70 and 74"))
 
-depdata.summary <- depdata.summary %>%
+# depdata.summary$DODEP <- sapply(depdata.summary$DODEP,scale9b)
+
+depdata.summary1 <- depdata.summary1 %>%
   rename(
-    Depression = DODEP,
-    Depression_Severity = DEPDVSEV,
-    Workhours = LBFDGHPW,
+    "Depression Severity" = DEPDVSEV,
+    'Workhours' = LBFDGHPW,
     Part_Fulltime_Work = LBFDVPFT,
-    Work_type = LBFDGOCG,
-    Location = GEO_PRV,
+    'Work type' = LBFDGOCG,
     Sex = DHH_SEX,
     Martial_Status = DHHGMS,
     Age = DHHGAGE,
     Racial_background = SDCDGCGT,
     Household_income = INCDGHH,
-    Drink_type = ALCDVTTM,
-    Drink_frequency = ALC_015,
-    Smoking_status = SMKDVSTY,
+    "Perceived Health (General)" = GENDVHDI,
+    "Perceived Mental Health" = GENDVMHI,
+    "Type of drinker (Last 12 months)" = ALCDVTTM,
+    "Smoking status " = SMKDVSTY,
+    "Type of smoker)" = SMK_005,
     BMI = HWTDGISW,
     Education = EHG2DVR3
   )
 
-view(dfSummary(depdata.summary, plain.ascii = FALSE, style = "grid", 
-          graph.magnif = 0.75, valid.col = FALSE, tmp.img.dir = "/tmp"))
-```
+view(dfSummary(depdata50to64, plain.ascii = FALSE, style = "grid", 
+               graph.magnif = 0.75, valid.col = FALSE, tmp.img.dir = "/tmp"))
 
+#Tables for report
+depdatafull <- data.frame(matrix(ncol = 3, nrow = 60))
+
+colnames(depdatafull) <- c ("", "","")
+rownames(depdatafull) <- c("Average hours worked per week",
+                               "No depression",
+                               "Minimal depression",
+                               "Mild depression",
+                               "Moderate depression",
+                               "Moderately severe depression",
+                               "Severe depression",
+                               "Low Depression",
+                               "High Depression",
+                               "Male",
+                               "Female",
+                               "White",
+                               "Non-white (Aboriginal or Other Visible Minority)",
+                               "Married",
+                               "Common-law",
+                               "Widowed/Divorced/Separate",
+                               "Single",
+                               "Less than secondary school",
+                               "Secondary school graduation",
+                               "Post-secondary",
+                               "Full time",
+                               "Part time",
+                               "No income or less than 20 000",
+                               "20,000 to 39,999",
+                               "40,000 to 59,999",
+                               "60,000 to 79,999",
+                               "80,000 or more",
+                               "No work stress",
+                               "Minimal work stress",
+                               "High work stress" ,  
+                               "NOC 1,3,4,5,6",
+                               "NOC 2",
+                               "NOC 6",
+                               "NOC 7",
+                               "NOC 8,9",
+                               "Poor (General)",
+                               "Fair (General)",
+                               "Good (General)",
+                               "Very Good (General)",
+                               "Excellent (General)",
+                               "Poor",
+                               "Fair",
+                               "Good",
+                               "Very Good",
+                               "Excellent",
+                               "Underweight",
+                               "Normal weight",
+                               "Overweight",
+                               "Obese - Class I, II, III",
+                               "Regular drinker",
+                               "Occasional drinker",
+                               "Daily",
+                               "Occasionally",
+                               "Not at all",
+                               "Current daily smoker",
+                               "Current occasional smoker",
+                               "Former daily smoker",
+                               "Former occasional smoker",
+                               "Experimental smoker",
+                               "Lifetime abstainer"
+  
+)
+#808
+depdata18to29 <- depdata.summary1 %>%
+  filter(agebracket == "[18-29]")
+#1600
+depdata30to49 <- depdata.summary1 %>%
+  filter(agebracket == "[30-49]")
+#1025
+depdata50to64 <- depdata.summary1 %>%
+  filter(agebracket == "[50-64]")
+
+dep18to29 <- c("41 (2 - 98)",
+               "268 (33.2%)",
+               "342 (42.3%)",
+               "129 (16.0%)",
+               "47 (5.8%)",
+               "17 (2.1%)",
+               "5 (0.6%)",
+               "739 (91.5%)",
+               "69 (8.5%)",
+               "440 (54.5%)",
+               "368 (45.5%)",
+               "714 (88.4%)",
+               "94 (11.6%)",
+               "147 (18.2%)",
+               "134 (16.6%)",
+               "15 (1.9%)",
+               "512 (63.4%)",
+               "46 (5.7%)",
+               "325 (40.2%)",
+               "437 (54.1%)",
+               "683 (84.5%)",
+               "125 (15.5%)",
+               #income
+               "48 (5.9%)",
+               "115 (14.2%)",
+               "134 (16.6%)",
+               "102 (12.6%)",
+               "409 (50.6%)",
+               "53 (6.6%)",
+               "582 (72.0%)",
+               "173 (21.4%)",
+               #noc
+               "247 (30.6%)",
+               "90 (11.1%)",
+               "235 (29.1%)",
+               "177 (21.9%)",
+               "59 (7.3%)",
+               "4 (0.5%)",
+               "39 (4.8%)",
+               "178 (22.0%)",
+               "372 (46.0%)",
+               "215 (26.6%)",
+               "8 (1.0%)",
+               "48 (5.9%)",
+               "167 (20.7%)",
+               "320 (39.6%)",
+               "265 (32.8%)",
+               "18 (2.2%)",
+               "400 (49.5%)",
+               "245 (30.3%)",
+               "145 (17.9%)",
+               "666 (82.4%)",
+               "142 (17.6%)",
+               "127 (15.7%)" ,
+               "64 (7.9%)",
+               "617 (76.4%)",
+               "127 (15.7%)",
+               "64 (7.9%)",
+               "57 (7.0%)",
+               "19 (2.4%)",
+               "148 (18.3%)",
+               "393 (48.6%)")
+
+dep30to49 <- c("41 (2 - 98)",
+               "619 (38.7%)",
+               "636 (39.8%)",
+               "242 (15.1%)",
+               "74 (4.6%)",
+               "22 (1.4%)",
+               "7 (0.4%)",
+               "1497 (93.6%)",
+               "103 (6.4%)",
+               "808 (50.5%)",
+               "792 (49.5%)",
+               
+               "1442 (90.1%)",
+               "158 (9.9%)",
+               
+               "945 (59.1%)",
+               "161 (10.1%)",
+               "181 (11.3%)",
+               "313 (19.6%)",
+               
+               "94 (5.9%)",
+               "354 (22.1%)",
+               "1152 (72.0%)",
+               
+               "1467 (91.7%)",
+               "133 (8.3%)",
+               #income
+               "30 (1.9%)",
+               "122 (7.6%)",
+               "204 (12.8%)",
+               "224 (14.0%)",
+               "1020 (63.7%)",
+               
+               "107 (6.7%)",
+               "1075 (67.2%)",
+               "418 (26.1%)",
+               #noc
+               "698 (43.6%)",
+               "256 (16.0%)",
+               "259 (16.2%)",
+               "270 (16.9%)",
+               "117 (7.3%)",
+               
+               "9 (0.6%)",
+               "80 (5.0%)",
+               "401 (25.1%)",
+               "715 (44.7%)",
+               "395 (24.7%)",
+               
+               "16 (1.0%)",
+               "72 (4.5%)",
+               "325 (20.3%)",
+               "692 (43.2%)",
+               "495 (30.9%)",
+               
+               "17 (1.1%)",
+               "537 (33.6%)",
+               "535 (33.4%)",
+               "511 (31.9%)",
+               
+               "1280 (80.0%)",
+               "320 (20.0%)",
+               
+               "295 (18.4%)" ,
+               "80 (5.0%)",
+               "1225 (76.6%)",
+               
+               "295 (18.4%)",
+               "80 (5.0%)",
+               "344 (21.5%)",
+               "54 (3.4%)",
+               "253 (15.8%)",
+               "574 (35.9%)")
+
+dep50to64 <- c("41 (4 - 98)",
+               "445 (43.4%)",
+               "382 (37.3%)",
+               "147 (14.3%)",
+               "30 (2.9%)",
+               "14 (1.4%)",
+               "7 (0.7%)",
+               "974 (95.0%)",
+               "51 (5.0%)",
+               "508 (49.6%)",
+               "517 (50.4%)",
+               
+               "993 (96.9%)",
+               "32 (3.1%)",
+               
+               "637 (62.2%)",
+               "79 (7.7%)",
+               "212 (20.7%)",
+               "97 (9.5%)",
+               
+               "121 (11.8%)",
+               "266 (25.9%)",
+               "638 (62.2%)",
+               
+               "903 (88.1%)",
+               "122 (11.9%)",
+               #income
+               "15 (1.5%)",
+               "90 (8.8%)",
+               "153 (14.9%)",
+               "148 (14.4%)",
+               "619 (60.4%)",
+               
+               "100 (9.8%)",
+               "677 (66.0%)",
+               "248 (24.2%)",
+               #noc
+               "377 (36.8%)",
+               "191 (18.6%)",
+               "210 (20.5%)",
+               "177 (17.3%)",
+               "70 (6.8%)",
+               
+               "12 (1.2%)",
+               "86 (8.4%)",
+               "318 (31.0%)",
+               "426 (41.6%)",
+               "183 (17.8%)",
+               
+               "11 (1.1%)",
+               "45 (4.4%)",
+               "218 (21.3%)",
+               "425 (41.5%)",
+               "326 (31.8%)",
+               
+               "2 (0.2%)",
+               "288 (28.1%)",
+               "400 (39.0%)",
+               "335 (32.7%)",
+               
+               "809 (78.9%)",
+               "216 (21.1%)",
+               
+               "186 (18.1%)" ,
+               "28 (2.7%)",
+               "811 (79.1%)",
+               
+               "186 (18.1%)",
+               "28 (2.7%)",
+               "341 (33.3%)",
+               "45 (4.4%)",
+               "142 (13.9%)",
+               "283 (27.6%)")
+
+depdatafull[,1] <- dep18to29
+depdatafull[,2] <- dep30to49
+depdatafull[,3] <- dep50to64
+
+depdatafull %>% 
+  kbl(caption = "Table 1: Demographic and variable data from participants from the 2015-2016 Canadian Community Healthy Survey, by age group", ) %>%
+  kable_classic(full_width = FALSE,position = "center") %>%
+  add_header_above(c(" "=1,"(n = 808)"=1,"(n = 1600)"=1,"(n = 1025)"=1)) %>%
+  add_header_above(c(" "=1,"18-29"=1,"30-49"=1,"50-64"=1))%>%
+  add_header_above(c(" "=1, "Age group,yr; frequency of respondents (with percentages)"=3)) %>%
+  pack_rows("Depression severity", 2, 7) %>%
+  pack_rows("Depression High/Low", 8, 9) %>%
+  pack_rows("Sex", 10, 11) %>%
+  pack_rows("Racial background", 12, 13) %>%
+  pack_rows("Martial Status", 14, 17) %>%
+  pack_rows("Education", 18, 20) %>%
+  pack_rows("Work Status", 21, 22) %>%
+  pack_rows("Household income", 23, 27) %>%
+  pack_rows("Work stress", 28, 30) %>%
+  pack_rows("Work group", 31, 35) %>%
+  pack_rows("Perceived general health", 36, 40) %>%
+  pack_rows("Perceived mental health", 41, 45) %>%
+  pack_rows("BMI", 46, 49) %>%
+  pack_rows("Drinking Frequency", 50, 51) %>%
+  pack_rows("Smoking status", 52, 54) %>%
+  pack_rows("Smoking Frequency", 55, 60)
+
+
+View(dep.resultsfull)
+
+dep.resultsor <- dep.resultsfull[-1,4:5]
+
+rownames(dep.resultsfull) <- c("Hours worked per week",
+                               "High job skill",
+                               "Medium job skill",
+                               "Low job skill",
+                               "High job security",
+                               "Average job security",
+                               "Low job security",
+                               "Work authority 3,4,5",
+                               "Work authority 6,7,8,9",
+                               "Social support 5,6,7,8",
+                               "Social support 9,10,11,12,13",
+                               "20,000 to $39,999",
+                               "40,000 to $59,999",
+                               "60,000 to $79,999",
+                               "80,000 or more",
+                               "Age 30 - 49",
+                               "Age 50 - 64",
+                               "Non-white (Aboriginal or Other Visible Minority)",
+                               "Occasional smoker",
+                               "Daily smoker",
+                               "Underweight",
+                               "Overweight",
+                               "Obese - Class I, II, III",
+                               "Minimal Life stress",
+                               "High Life stress"
+)
+
+AdjustedOR <- c("0.980 (0.969 - 0.991)",
+                 "2.074 (1.358 - 3.278)",
+                 "3.924 (2.229 - 6.984)",
+                 "1.048 (0.740 - 1.489)",
+                 "1.898 (1.243 - 2.885)",
+                 "1.365 (0.925 - 2.052)",
+                 "1.908 (1.178 - 3.103)",
+                 "1.027 (0.741 - 1.419)",
+                 "1.983 (1.150 - 3.335)",
+                 "0.495 (0.242 - 1.036)",
+                 "0.346 (0.170 - 0.725)",
+                 "0.587 (0.291 - 1.220)",
+                 "0.286 (0.150 - 0.567)",
+                 "0.723 (0.502 - 1.046)",
+                 "0.512 (0.335 - 0.781)",
+                 "0.568 (0.277 - 1.058)",
+                 "1.451 (0.714 - 2.718)",
+                 "1.890 (1.338 - 2.648)",
+                 "1.768 (0.507 - 5.238)",
+                 "1.384 (0.942 - 2.038)",
+                 "2.021 (1.391 - 2.953)",
+                 "1.903 (0.824 - 5.548)",
+                 "11.286 (4.887 - 32.909)")
+
+CrudeOR <- c("0.976 (0.966 - 0.986)",
+              "2.349 (1.576 - 3.638)",
+              "6.105 (3.715 - 10.200)",
+              "1.212 (0.882 - 1.671)",
+              "3.227 (2.238 - 4.640)",
+              "1.561 (1.094 - 2.275)",
+              "3.865 (2.555 - 5.906)",
+              "1.423 (1.061 - 1.904)",
+              "4.608 (2.894 - 7.159)",
+              "0.467 (0.255 - 0.876)",
+              "0.290 (0.158 - 0.543)",
+              "0.379 (0.211 - 0.699)",
+              "0.185 (0.109 - 0.327)",
+              "0.737 (0.538 - 1.016)",
+              "0.561 (0.384 - 0.814)",
+              "0.558 (0.283 - 0.988)",
+              "1.326 (0.684 - 2.345)",
+              "2.264 (1.665 - 3.051)",
+              "3.454 (1.264 - 8.035)",
+              "1.091 (0.769 - 1.550)",
+              "1.653 (1.184 - 2.317)",
+              "1.837 (0.817 - 5.254)",
+              "10.600 (4.752 - 30.191)")
+
+```
