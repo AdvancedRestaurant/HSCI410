@@ -950,7 +950,7 @@ view(dfSummary(depdata50to64, plain.ascii = FALSE, style = "grid",
                graph.magnif = 0.75, valid.col = FALSE, tmp.img.dir = "/tmp"))
 
 #Tables for report
-depdatafull <- data.frame(matrix(ncol = 3, nrow = 60))
+depdatafull <- data.frame(matrix(ncol = 3, nrow = 52))
 
 colnames(depdatafull) <- c ("", "","")
 rownames(depdatafull) <- c("Average hours worked per week",
@@ -960,8 +960,6 @@ rownames(depdatafull) <- c("Average hours worked per week",
                                "Moderate depression",
                                "Moderately severe depression",
                                "Severe depression",
-                               "Low Depression",
-                               "High Depression",
                                "Male",
                                "Female",
                                "White",
@@ -1006,13 +1004,7 @@ rownames(depdatafull) <- c("Average hours worked per week",
                                "Occasional drinker",
                                "Daily",
                                "Occasionally",
-                               "Not at all",
-                               "Current daily smoker",
-                               "Current occasional smoker",
-                               "Former daily smoker",
-                               "Former occasional smoker",
-                               "Experimental smoker",
-                               "Lifetime abstainer"
+                               "Not at all"
   
 )
 #808
@@ -1032,8 +1024,6 @@ dep18to29 <- c("41 (2 - 98)",
                "47 (5.8%)",
                "17 (2.1%)",
                "5 (0.6%)",
-               "739 (91.5%)",
-               "69 (8.5%)",
                "440 (54.5%)",
                "368 (45.5%)",
                "714 (88.4%)",
@@ -1080,13 +1070,8 @@ dep18to29 <- c("41 (2 - 98)",
                "142 (17.6%)",
                "127 (15.7%)" ,
                "64 (7.9%)",
-               "617 (76.4%)",
-               "127 (15.7%)",
-               "64 (7.9%)",
-               "57 (7.0%)",
-               "19 (2.4%)",
-               "148 (18.3%)",
-               "393 (48.6%)")
+               "617 (76.4%)"
+               )
 
 dep30to49 <- c("41 (2 - 98)",
                "619 (38.7%)",
@@ -1095,8 +1080,6 @@ dep30to49 <- c("41 (2 - 98)",
                "74 (4.6%)",
                "22 (1.4%)",
                "7 (0.4%)",
-               "1497 (93.6%)",
-               "103 (6.4%)",
                "808 (50.5%)",
                "792 (49.5%)",
                
@@ -1153,14 +1136,7 @@ dep30to49 <- c("41 (2 - 98)",
                
                "295 (18.4%)" ,
                "80 (5.0%)",
-               "1225 (76.6%)",
-               
-               "295 (18.4%)",
-               "80 (5.0%)",
-               "344 (21.5%)",
-               "54 (3.4%)",
-               "253 (15.8%)",
-               "574 (35.9%)")
+               "1225 (76.6%)")
 
 dep50to64 <- c("41 (4 - 98)",
                "445 (43.4%)",
@@ -1169,8 +1145,6 @@ dep50to64 <- c("41 (4 - 98)",
                "30 (2.9%)",
                "14 (1.4%)",
                "7 (0.7%)",
-               "974 (95.0%)",
-               "51 (5.0%)",
                "508 (49.6%)",
                "517 (50.4%)",
                
@@ -1227,14 +1201,7 @@ dep50to64 <- c("41 (4 - 98)",
                
                "186 (18.1%)" ,
                "28 (2.7%)",
-               "811 (79.1%)",
-               
-               "186 (18.1%)",
-               "28 (2.7%)",
-               "341 (33.3%)",
-               "45 (4.4%)",
-               "142 (13.9%)",
-               "283 (27.6%)")
+               "811 (79.1%)")
 
 depdatafull[,1] <- dep18to29
 depdatafull[,2] <- dep30to49
@@ -1247,21 +1214,19 @@ depdatafull %>%
   add_header_above(c(" "=1,"18-29"=1,"30-49"=1,"50-64"=1))%>%
   add_header_above(c(" "=1, "Age group,yr; frequency of respondents (with percentages)"=3)) %>%
   pack_rows("Depression severity", 2, 7) %>%
-  pack_rows("Depression High/Low", 8, 9) %>%
-  pack_rows("Sex", 10, 11) %>%
-  pack_rows("Racial background", 12, 13) %>%
-  pack_rows("Martial Status", 14, 17) %>%
-  pack_rows("Education", 18, 20) %>%
-  pack_rows("Work Status", 21, 22) %>%
-  pack_rows("Household income", 23, 27) %>%
-  pack_rows("Work stress", 28, 30) %>%
-  pack_rows("Work group", 31, 35) %>%
-  pack_rows("Perceived general health", 36, 40) %>%
-  pack_rows("Perceived mental health", 41, 45) %>%
-  pack_rows("BMI", 46, 49) %>%
-  pack_rows("Drinking Frequency", 50, 51) %>%
-  pack_rows("Smoking status", 52, 54) %>%
-  pack_rows("Smoking Frequency", 55, 60)
+  pack_rows("Sex", 8, 9) %>%
+  pack_rows("Racial background", 10, 11) %>%
+  pack_rows("Martial Status", 12, 15) %>%
+  pack_rows("Education", 16, 18) %>%
+  pack_rows("Work Status", 19, 20) %>%
+  pack_rows("Household income", 21, 25) %>%
+  pack_rows("Work stress", 26, 28) %>%
+  pack_rows("Work group", 29, 33) %>%
+  pack_rows("Perceived general health", 34,38 ) %>%
+  pack_rows("Perceived mental health", 39, 43) %>%
+  pack_rows("BMI", 44, 47) %>%
+  pack_rows("Drinking Frequency", 48, 49) %>%
+  pack_rows("Smoking status", 50, 52)
 
 
 View(dep.resultsfull)
