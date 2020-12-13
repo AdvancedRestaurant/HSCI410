@@ -625,7 +625,7 @@ factor.race <- factor(depdata18to64.test$SDCDGCGT, levels = c(0,1))
 
 dep.wrkhours <- glm(depdata18to64.test$groupdep ~ depdata18to64.test$LBFDGHPW, family = "binomial")
 
-#Forward stepwise regression to determine variables to add 
+#Forward stepwise regression to determine variables to add 22 variables
 full <- glm(depdata18to64.test$groupdep ~ depdata18to64.test$LBFDGHPW + depdata18to64.test$Work_Stress  + depdata18to64.test$Life_stress + 
               depdata18to64.test$LBFDVPFT + factor.worktype + depdata18to64.test$DHH_SEX + factor.martial + depdata18to64.test$SDCDGCGT + 
               factor.incomehousehold + depdata18to64.test$ALCDVTTM + factor.alcfreq + factor.smkrtype + factor.smkstatus + factor.bmi + 
@@ -647,6 +647,14 @@ dep.wrkhoursfull<- glm(formula = depdata18to64.test$groupdep ~ depdata18to64.tes
                          depdata18to64.test$Life_stress, family = "binomial")
 
 summary(dep.wrkhoursfull)
+
+
+wrkhours.scale <- (depdata18to64.test$LBFDGHPW/10)
+
+dep.wrkhoursfull.scale<- glm(formula = depdata18to64.test$groupdep ~ wrkhours.scale + depdata18to64.test$wrkstress.skill + 
+                         depdata18to64.test$wrkstress.security + depdata18to64.test$wrkstress.authority + depdata18to64.test$wrkstress.social + 
+                         factor.incomehousehold + depdata18to64.test$agebracket +depdata18to64.test$SDCDGCGT + factor.smkrtype + factor.bmi + 
+                         depdata18to64.test$Life_stress, family = "binomial")
 
 ```
 
@@ -684,6 +692,7 @@ dep.resultsfull <- round(dep.resultsfull,3)
 
 #getting crude OR and confint
 workhours.crude <- glm(depdata18to64.test$groupdep ~ depdata18to64.test$LBFDGHPW, family = "binomial")
+workhours.crude.scale <- glm(depdata18to64.test$groupdep ~ wrkhours.scale, family = "binomial")
 wrkstr.skillcrude <- glm(depdata18to64.test$groupdep ~ depdata18to64.test$wrkstress.skill, family = "binomial")
 wrkstr.secucrude <- glm(depdata18to64.test$groupdep ~ depdata18to64.test$wrkstress.security, family = "binomial")
 wrkstr.authcrude <- glm(depdata18to64.test$groupdep ~ depdata18to64.test$wrkstress.authority, family = "binomial")
@@ -854,6 +863,8 @@ dep.resultsfull <- dep.resultsfull %>%
 dep.resultsfull <- dep.resultsfull[1:5]
 #dep.resultsfull[,3] <- round(dep.results[,3],3)
 
+
+#Temporary OR table
 dep.resultsfull %>% 
   kbl(caption = "This is a title placeholder to be changed later") %>%
   kable_paper("striped",full_width = FALSE,position = "center") %>%
@@ -885,6 +896,8 @@ library(hrbrthemes)
 library(gridExtra)
 library(grid)
 library(summarytools)
+library(rstatix)
+library(ggpubr)
 
 depdata.graph <- depdata1 %>%
   filter(!DHHGAGE %in% c("Age between 65 and 69","Age between 70 and 74"))
@@ -900,7 +913,7 @@ malehours <- data.frame(x = depdata.male$LBFDGHPW)
 femalehours <- data.frame(x = depdata.female$LBFDGHPW)
 allhours <- data.frame(x=depdata.graph$LBFDGHPW)
 
-
+#Histogram 
 mfhours <-ggplot()+
   aes(x=x)+
   geom_histogram(data = malehours, fill = "#33ccff", alpha = 0.6, binwidth = 12) +
@@ -946,15 +959,14 @@ depdata.summary1 <- depdata.summary1 %>%
     Education = EHG2DVR3
   )
 
-view(dfSummary(depdata50to64, plain.ascii = FALSE, style = "grid", 
+view(dfSummary(depdata.summary1, plain.ascii = FALSE, style = "grid", 
                graph.magnif = 0.75, valid.col = FALSE, tmp.img.dir = "/tmp"))
 
 #Tables for report
-depdatafull <- data.frame(matrix(ncol = 3, nrow = 52))
+depdatafull <- data.frame(matrix(ncol = 3, nrow = 41))
 
 colnames(depdatafull) <- c ("", "","")
-rownames(depdatafull) <- c("Average hours worked per week",
-                               "No depression",
+rownames(depdatafull) <- c("No depression",
                                "Minimal depression",
                                "Mild depression",
                                "Moderate depression",
@@ -971,21 +983,11 @@ rownames(depdatafull) <- c("Average hours worked per week",
                                "Less than secondary school",
                                "Secondary school graduation",
                                "Post-secondary",
-                               "Full time",
-                               "Part time",
                                "No income or less than 20 000",
                                "20,000 to 39,999",
                                "40,000 to 59,999",
                                "60,000 to 79,999",
                                "80,000 or more",
-                               "No work stress",
-                               "Minimal work stress",
-                               "High work stress" ,  
-                               "NOC 1,3,4,5,6",
-                               "NOC 2",
-                               "NOC 6",
-                               "NOC 7",
-                               "NOC 8,9",
                                "Poor (General)",
                                "Fair (General)",
                                "Good (General)",
@@ -1017,41 +1019,36 @@ depdata30to49 <- depdata.summary1 %>%
 depdata50to64 <- depdata.summary1 %>%
   filter(agebracket == "[50-64]")
 
-dep18to29 <- c("41 (2 - 98)",
+dep18to29 <- c(
                "268 (33.2%)",
                "342 (42.3%)",
                "129 (16.0%)",
                "47 (5.8%)",
                "17 (2.1%)",
                "5 (0.6%)",
+               
                "440 (54.5%)",
                "368 (45.5%)",
+               
                "714 (88.4%)",
                "94 (11.6%)",
+               
                "147 (18.2%)",
                "134 (16.6%)",
                "15 (1.9%)",
                "512 (63.4%)",
+               
                "46 (5.7%)",
                "325 (40.2%)",
                "437 (54.1%)",
-               "683 (84.5%)",
-               "125 (15.5%)",
+               
                #income
                "48 (5.9%)",
                "115 (14.2%)",
                "134 (16.6%)",
                "102 (12.6%)",
                "409 (50.6%)",
-               "53 (6.6%)",
-               "582 (72.0%)",
-               "173 (21.4%)",
-               #noc
-               "247 (30.6%)",
-               "90 (11.1%)",
-               "235 (29.1%)",
-               "177 (21.9%)",
-               "59 (7.3%)",
+               
                "4 (0.5%)",
                "39 (4.8%)",
                "178 (22.0%)",
@@ -1073,7 +1070,7 @@ dep18to29 <- c("41 (2 - 98)",
                "617 (76.4%)"
                )
 
-dep30to49 <- c("41 (2 - 98)",
+dep30to49 <- c(
                "619 (38.7%)",
                "636 (39.8%)",
                "242 (15.1%)",
@@ -1095,24 +1092,12 @@ dep30to49 <- c("41 (2 - 98)",
                "354 (22.1%)",
                "1152 (72.0%)",
                
-               "1467 (91.7%)",
-               "133 (8.3%)",
                #income
                "30 (1.9%)",
                "122 (7.6%)",
                "204 (12.8%)",
                "224 (14.0%)",
                "1020 (63.7%)",
-               
-               "107 (6.7%)",
-               "1075 (67.2%)",
-               "418 (26.1%)",
-               #noc
-               "698 (43.6%)",
-               "256 (16.0%)",
-               "259 (16.2%)",
-               "270 (16.9%)",
-               "117 (7.3%)",
                
                "9 (0.6%)",
                "80 (5.0%)",
@@ -1138,7 +1123,7 @@ dep30to49 <- c("41 (2 - 98)",
                "80 (5.0%)",
                "1225 (76.6%)")
 
-dep50to64 <- c("41 (4 - 98)",
+dep50to64 <- c(
                "445 (43.4%)",
                "382 (37.3%)",
                "147 (14.3%)",
@@ -1160,24 +1145,13 @@ dep50to64 <- c("41 (4 - 98)",
                "266 (25.9%)",
                "638 (62.2%)",
                
-               "903 (88.1%)",
-               "122 (11.9%)",
+
                #income
                "15 (1.5%)",
                "90 (8.8%)",
                "153 (14.9%)",
                "148 (14.4%)",
                "619 (60.4%)",
-               
-               "100 (9.8%)",
-               "677 (66.0%)",
-               "248 (24.2%)",
-               #noc
-               "377 (36.8%)",
-               "191 (18.6%)",
-               "210 (20.5%)",
-               "177 (17.3%)",
-               "70 (6.8%)",
                
                "12 (1.2%)",
                "86 (8.4%)",
@@ -1207,105 +1181,296 @@ depdatafull[,1] <- dep18to29
 depdatafull[,2] <- dep30to49
 depdatafull[,3] <- dep50to64
 
+
+#Second table
+depdatafullb <- data.frame(matrix(ncol = 3, nrow = 11))
+
+colnames(depdatafullb) <- c ("", "","")
+rownames(depdatafullb) <- c("Average hours worked per week",
+                               "Full Time",
+                               "Part Time",
+                               "No work stress",
+                               "Minimal work stress",
+                               "High work stress" ,  
+                               "NOC 1,3,4,5,6",
+                               "NOC 2",
+                               "NOC 6",
+                               "NOC 7",
+                               "NOC 8,9")
+#808
+depdata18to29b <- depdata.summary1 %>%
+  filter(agebracket == "[18-29]")
+#1600
+depdata30to49b <- depdata.summary1 %>%
+  filter(agebracket == "[30-49]")
+#1025
+depdata50to64b <- depdata.summary1 %>%
+  filter(agebracket == "[50-64]")
+
+dep18to29b <- c("41 (2 - 98)",
+              
+               "683 (84.5%)",
+               "125 (15.5%)",
+
+               "53 (6.6%)",
+               "582 (72.0%)",
+               "173 (21.4%)",
+               #noc
+               "247 (30.6%)",
+               "90 (11.1%)",
+               "235 (29.1%)",
+               "177 (21.9%)",
+               "59 (7.3%)")
+
+dep30to49b <- c("41 (2 - 98)",
+
+               "1467 (91.7%)",
+               "133 (8.3%)",
+               
+               "107 (6.7%)",
+               "1075 (67.2%)",
+               "418 (26.1%)",
+               #noc
+               "698 (43.6%)",
+               "256 (16.0%)",
+               "259 (16.2%)",
+               "270 (16.9%)",
+               "117 (7.3%)")
+
+dep50to64b <- c("41 (4 - 98)",
+               
+               "903 (88.1%)",
+               "122 (11.9%)",
+               
+               "100 (9.8%)",
+               "677 (66.0%)",
+               "248 (24.2%)",
+               #noc
+               "377 (36.8%)",
+               "191 (18.6%)",
+               "210 (20.5%)",
+               "177 (17.3%)",
+               "70 (6.8%)")
+
+
+
+depdatafullb[,1] <- dep18to29b
+depdatafullb[,2] <- dep30to49b
+depdatafullb[,3] <- dep50to64b
+
+
+#Final frequency table for report
+
 depdatafull %>% 
-  kbl(caption = "Table 1: Demographic and variable data from participants from the 2015-2016 Canadian Community Healthy Survey, by age group", ) %>%
+  kbl(caption = "<b>Table 1: Socialdemographic and lifestyle data from participants from the 2015-2016 Canadian Community Healthy Survey, by age group</b>",format = "html") %>%
   kable_classic(full_width = FALSE,position = "center") %>%
   add_header_above(c(" "=1,"(n = 808)"=1,"(n = 1600)"=1,"(n = 1025)"=1)) %>%
   add_header_above(c(" "=1,"18-29"=1,"30-49"=1,"50-64"=1))%>%
   add_header_above(c(" "=1, "Age group,yr; frequency of respondents (with percentages)"=3)) %>%
-  pack_rows("Depression severity", 2, 7) %>%
-  pack_rows("Sex", 8, 9) %>%
-  pack_rows("Racial background", 10, 11) %>%
-  pack_rows("Martial Status", 12, 15) %>%
-  pack_rows("Education", 16, 18) %>%
-  pack_rows("Work Status", 19, 20) %>%
-  pack_rows("Household income", 21, 25) %>%
-  pack_rows("Work stress", 26, 28) %>%
-  pack_rows("Work group", 29, 33) %>%
-  pack_rows("Perceived general health", 34,38 ) %>%
-  pack_rows("Perceived mental health", 39, 43) %>%
-  pack_rows("BMI", 44, 47) %>%
-  pack_rows("Drinking Frequency", 48, 49) %>%
-  pack_rows("Smoking status", 50, 52)
+  pack_rows("Depression severity", 1, 6) %>%
+  pack_rows("Sex", 7, 8) %>%
+  pack_rows("Racial background", 9, 10) %>%
+  pack_rows("Martial Status", 11, 14) %>%
+  pack_rows("Education", 15, 17) %>%
+  
+  pack_rows("Household income", 18, 22) %>%
+  pack_rows("Perceived general health", 23,27) %>%
+  pack_rows("Perceived mental health", 28, 32) %>%
+  pack_rows("BMI", 33, 36) %>%
+  pack_rows("Drinking Frequency", 37, 38) %>%
+  pack_rows("Smoking status", 39, 41) %>%
+  footnote(general = "Number of individuals (n) used in study = 3433",
+           general_title = "General:",
+           title_format = c("italic","underline")
+  )
+
+
+#Table 2
+depdatafullb %>% 
+  kbl(caption = "<b>Table 2: Work related data from participants from the 2015-2016 Canadian Community Healthy Survey, by age group</b>",format = "html") %>%
+  kable_classic(full_width = FALSE,position = "center") %>%
+  add_header_above(c(" "=1,"(n = 808)"=1,"(n = 1600)"=1,"(n = 1025)"=1)) %>%
+  add_header_above(c(" "=1,"18-29"=1,"30-49"=1,"50-64"=1))%>%
+  add_header_above(c(" "=1, "Age group,yr; frequency of respondents (with percentages)"=3)) %>%
+  pack_rows("Work status", 2, 3) %>%
+  pack_rows("Work Stress", 4, 6) %>%
+  pack_rows("NOC skill types", 7, 11) %>%
+  footnote(general = "Number of individuals (n) used in study = 3433, National Occupational Classification (NOC)",
+           number = c("Business, Finance, and Administration, Health occupation, Education, Law and social,
+                      Community and Government Services, Art, Culture, Recreation, Sport, Sales and service",
+                      "Natural and applied sciences",
+                      "Sales and service occupations",
+                      "Trade, transport and equipment operators",
+                      "Natural resource and Agriculture, Manufacturing and utilties"),
+           general_title = "General:",
+           number_title = c("NOC following order of the table 2"),
+           title_format = c("italic","underline")
+  )
 
 
 View(dep.resultsfull)
 
-dep.resultsor <- dep.resultsfull[-1,4:5]
+dep.resultsor <- data.frame(matrix(ncol = 2, nrow = 33))
 
-rownames(dep.resultsfull) <- c("Hours worked per week",
-                               "High job skill",
-                               "Medium job skill",
-                               "Low job skill",
-                               "High job security",
-                               "Average job security",
-                               "Low job security",
-                               "Work authority 3,4,5",
-                               "Work authority 6,7,8,9",
-                               "Social support 5,6,7,8",
-                               "Social support 9,10,11,12,13",
-                               "20,000 to $39,999",
-                               "40,000 to $59,999",
-                               "60,000 to $79,999",
-                               "80,000 or more",
-                               "Age 30 - 49",
-                               "Age 50 - 64",
-                               "Non-white (Aboriginal or Other Visible Minority)",
-                               "Occasional smoker",
-                               "Daily smoker",
-                               "Underweight",
-                               "Overweight",
-                               "Obese - Class I, II, III",
-                               "Minimal Life stress",
-                               "High Life stress"
+rownames(dep.resultsor) <- c("Hours worked per week",
+                             "High job skill",
+                             "Medium job skill",
+                             "Low job skill",
+                             "High job security",
+                             "Average job security",
+                             "Low job security",
+                             "High work authority",
+                             "Average work authority",
+                             "Low work authority",
+                             "High co-worker support",
+                             "Average co-worker support",
+                             "Low co-worker support",
+                             "No income to less than 20,000",
+                             "20,000 to 39,999",
+                             "40,000 to 59,999",
+                             "60,000 to 79,999",
+                             "80,000 or more",
+                             "Age 18 - 29",
+                             "Age 30 - 49",
+                             "Age 50 - 64",
+                             "White",
+                             "Non-white (Aboriginal or Other Visible Minority)",
+                             "Not at all",
+                             "Occasional smoker",
+                             "Daily smoker",
+                             "Normal weight",
+                             "Underweight",
+                             "Overweight",
+                             "Obese - Class I, II, III",
+                             "Low stress",
+                             "Minimal Life stress",
+                             "High Life stress"
 )
 
-AdjustedOR <- c("0.980 (0.969 - 0.991)",
+AdjustedORb <- c("0.817 (0.728 - 0.914)",
+                 "1.00",
                  "2.074 (1.358 - 3.278)",
                  "3.924 (2.229 - 6.984)",
+                 "1.00",
                  "1.048 (0.740 - 1.489)",
                  "1.898 (1.243 - 2.885)",
+                 "1.00",
                  "1.365 (0.925 - 2.052)",
                  "1.908 (1.178 - 3.103)",
+                 "1.00",
                  "1.027 (0.741 - 1.419)",
                  "1.983 (1.150 - 3.335)",
+                 "1.00",
                  "0.495 (0.242 - 1.036)",
                  "0.346 (0.170 - 0.725)",
                  "0.587 (0.291 - 1.220)",
                  "0.286 (0.150 - 0.567)",
+                 "1.00",
                  "0.723 (0.502 - 1.046)",
                  "0.512 (0.335 - 0.781)",
+                 "1.00",
                  "0.568 (0.277 - 1.058)",
+                 "1.00",
                  "1.451 (0.714 - 2.718)",
                  "1.890 (1.338 - 2.648)",
+                 "1.00",
                  "1.768 (0.507 - 5.238)",
                  "1.384 (0.942 - 2.038)",
                  "2.021 (1.391 - 2.953)",
+                 "1.00",
                  "1.903 (0.824 - 5.548)",
                  "11.286 (4.887 - 32.909)")
 
-CrudeOR <- c("0.976 (0.966 - 0.986)",
-              "2.349 (1.576 - 3.638)",
-              "6.105 (3.715 - 10.200)",
-              "1.212 (0.882 - 1.671)",
-              "3.227 (2.238 - 4.640)",
-              "1.561 (1.094 - 2.275)",
-              "3.865 (2.555 - 5.906)",
-              "1.423 (1.061 - 1.904)",
-              "4.608 (2.894 - 7.159)",
-              "0.467 (0.255 - 0.876)",
-              "0.290 (0.158 - 0.543)",
-              "0.379 (0.211 - 0.699)",
-              "0.185 (0.109 - 0.327)",
-              "0.737 (0.538 - 1.016)",
-              "0.561 (0.384 - 0.814)",
-              "0.558 (0.283 - 0.988)",
-              "1.326 (0.684 - 2.345)",
-              "2.264 (1.665 - 3.051)",
-              "3.454 (1.264 - 8.035)",
-              "1.091 (0.769 - 1.550)",
-              "1.653 (1.184 - 2.317)",
-              "1.837 (0.817 - 5.254)",
-              "10.600 (4.752 - 30.191)")
+CrudeORb <- c("0.784 (0.704 - 0.872)",
+             "1.00",
+             "2.349 (1.576 - 3.638)",
+             "6.105 (3.715 - 10.200)",
+             "1.00",
+             "1.212 (0.882 - 1.671)",
+             "3.227 (2.238 - 4.640)",
+             "1.00",
+             "1.561 (1.094 - 2.275)",
+             "3.865 (2.555 - 5.906)",
+             "1.00",
+             "1.423 (1.061 - 1.904)",
+             "4.608 (2.894 - 7.159)",
+             "1.00",
+             "0.467 (0.255 - 0.876)",
+             "0.290 (0.158 - 0.543)",
+             "0.379 (0.211 - 0.699)",
+             "0.185 (0.109 - 0.327)",
+             "1.00",
+             "0.737 (0.538 - 1.016)",
+             "0.561 (0.384 - 0.814)",
+             "1.00",
+             "0.558 (0.283 - 0.988)",
+             "1.00",
+             "1.326 (0.684 - 2.345)",
+             "2.264 (1.665 - 3.051)",
+             "1.00",
+             "3.454 (1.264 - 8.035)",
+             "1.091 (0.769 - 1.550)",
+             "1.653 (1.184 - 2.317)",
+             "1.00",
+             "1.837 (0.817 - 5.254)",
+             "10.600 (4.752 - 30.191)")
+
+dep.resultsor[,1] <- CrudeORb
+dep.resultsor[,2] <- AdjustedORb
+colnames(dep.resultsor) <- c ("", "")
+
+
+#Final OR table for report
+dep.resultsor %>% 
+  kbl(caption = "<b>Table 3: Estimated odds ratios (ORs) of participants aged 18 - 64 from the 2015-2016 Canadian community  Health Survey dealing with high depression by work hours, work, health and lifestyle characteristics</b>",format = "html") %>%
+  kable_classic(full_width = FALSE,position = "center") %>%
+  add_header_above(c(" "=1,"(and 95% CI)"=1,"(and 95% CI)"=1)) %>%
+  add_header_above(c(" "=1,"Crude OR"=1,"Adjusted OR"=1))%>%
+  pack_rows("Job skill", 2, 4) %>%
+  pack_rows("Job security", 5, 7) %>%
+  pack_rows("Work authority", 8, 10) %>%
+  pack_rows("Co-worker support", 11, 13) %>%
+  pack_rows("Average Household income", 14, 18) %>%
+  pack_rows("Age", 19, 21) %>%
+  pack_rows("Racial background", 22, 23) %>%
+  pack_rows("Smoking status", 24, 26) %>%
+  pack_rows("BMI", 27, 30) %>%
+  pack_rows("Life stress", 31, 33) %>%
+  footnote(general = "OR = Odds Ratio CI= confidence interval",
+           number = c("Number of individuals (n) used in study = 3433"),
+           general_title = "General:",
+           title_format = c("italic","underline")
+  )
+
+
+graphdata <-depdata18to64.test
+
+graphdata <- graphdata %>%
+  rename(
+    "Depression Severity" = DEPDVSEV,
+    'Workhours' = LBFDGHPW,
+    Part_Fulltime_Work = LBFDVPFT,
+    'Work type' = LBFDGOCG,
+    Sex = DHH_SEX,
+    Martial_Status = DHHGMS,
+    Age = DHHGAGE,
+    Racial_background = SDCDGCGT,
+    Household_income = INCDGHH,
+    "Perceived Health (General)" = GENDVHDI,
+    "Perceived Mental Health" = GENDVMHI,
+    "Type of drinker (Last 12 months)" = ALCDVTTM,
+    "Smoking status " = SMKDVSTY,
+    "Type of smoker)" = SMK_005,
+    BMI = HWTDGISW,
+    Education = EHG2DVR3
+  )
+
+ggsummarystats(
+  graphdata, x="agebracket", y = "Workhours",
+  ggfunc = ggboxplot, xlab = "Age Ranges", ylab ="Average Working hours (weekly)",
+  color = "agebracket", palette = c("#00AFBB", "#E7B800", "#FC4E07")
+)
+
+library(hrbrthemes)
 
 ```
